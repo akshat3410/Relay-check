@@ -2,7 +2,7 @@
   <img src="./assets/relay_banner.jpg" alt="Relay" width="100%" />
 
   <p>
-    <a href="https://www.npmjs.com/package/@relay/cli"><img src="https://img.shields.io/npm/v/@relay/cli.svg?style=flat-square&label=@relay/cli" alt="npm"></a>
+    <a href="https://github.com/akshat3410/Relay-check"><img src="https://img.shields.io/github/stars/akshat3410/Relay-check?style=flat-square&label=stars" alt="GitHub Stars"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT"></a>
     <a href="https://github.com/akshat3410/Relay-check/actions"><img src="https://img.shields.io/github/actions/workflow/status/akshat3410/Relay-check/ci.yml?style=flat-square" alt="CI"></a>
   </p>
@@ -30,13 +30,7 @@ It is not a linter. It is not an AI wrapper. It is a set of structured **skills*
 npx github:akshat3410/Relay-check
 ```
 
-Or install permanently so `relay` is always available:
-
-```bash
-npm install -g github:akshat3410/Relay-check
-```
-
-> **npm package coming soon.** Once published, this will be `npx @relay/cli`.
+That's it. No global install needed. Run it inside any project directory.
 
 Then scaffold a config and verify your environment:
 
