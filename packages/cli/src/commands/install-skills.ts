@@ -109,6 +109,21 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
       for (const skill of skillsList) {
         safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content);
       }
+
+      // Also install as real Claude Code slash commands (.claude/commands/)
+      const claudeCommandsDir = join(cwd, '.claude', 'commands');
+      logger.info('Installing Claude Code slash commands...');
+      for (const skill of skillsList) {
+        // Strip frontmatter for command files
+        let cleanContent = skill.content;
+        if (cleanContent.startsWith('---')) {
+          const parts = cleanContent.split('---');
+          if (parts.length >= 3) {
+            cleanContent = parts.slice(2).join('---').trim();
+          }
+        }
+        safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
+      }
     }
   }
 
