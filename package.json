@@ -10,7 +10,7 @@
     "next": "^14.0.0"
   },
   "scripts": {
-    "prepare": "pnpm install && turbo run build",
+    "prepare": "turbo run build",
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
