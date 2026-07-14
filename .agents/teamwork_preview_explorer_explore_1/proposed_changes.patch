@@ -1,0 +1,8 @@
+diff --git a/packages/rules/security/src/rules/hardcoded-secrets.test.ts b/packages/rules/security/src/rules/hardcoded-secrets.test.ts
+--- a/packages/rules/security/src/rules/hardcoded-secrets.test.ts
++++ b/packages/rules/security/src/rules/hardcoded-secrets.test.ts
+@@ -2,3 +2,3 @@
+ import { describe, it, expect } from 'vitest';
+-import { hardcodedSecretsRule } from '../src/rules/hardcoded-secrets.js';
++import { hardcodedSecretsRule } from './hardcoded-secrets.js';
+ import type { ProjectContext } from '@relay/shared';

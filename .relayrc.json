@@ -1,0 +1,3 @@
+{
+  "plugins": ["./packages/rules/security/dist/index.js"]
+}
