@@ -1,144 +1,90 @@
 <div align="center">
-  <img src="./assets/relay_banner.jpg" alt="Relay Banner" width="100%" />
-
-  <h1>⚡ Relay</h1>
-  <p><strong>Professional Review Platform for AI Coding Assistants. QA, Security, Release, and Architecture — One Engine, Zero Halos.</strong></p>
+  <img src="./assets/relay_banner.jpg" alt="Relay" width="100%" />
 
   <p>
-    <a href="https://www.npmjs.com/package/@relay/cli"><img src="https://img.shields.io/npm/v/@relay/cli.svg?style=flat-square&label=@relay/cli" alt="npm version"></a>
-    <a href="https://github.com/relay-dev/relay/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT License"></a>
-    <a href="https://github.com/relay-dev/relay/actions"><img src="https://img.shields.io/github/actions/workflow/status/relay-dev/relay/ci.yml?style=flat-square" alt="CI"></a>
+    <a href="https://www.npmjs.com/package/@relay/cli"><img src="https://img.shields.io/npm/v/@relay/cli.svg?style=flat-square&label=@relay/cli" alt="npm"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT"></a>
   </p>
 </div>
 
----
-
-> **Relay is not another linter. It is not an AI wrapper.**
->
-> Relay bridges the gap between deterministic static analysis and qualitative AI reviews. It provides structured methodology ("skills") and execution metrics that make AI coding assistants behave like Senior QA Engineers, Tech Leads, and Security Auditors.
+**Relay** gives your AI coding assistant a structured review methodology — turning it into a Senior QA Engineer, Security Auditor, or Tech Lead on demand.
 
 ---
 
-## 🚀 How it Works
-
-1. **Deterministic Scan**: Run `relay review` via CLI to gather clean, verified data.
-2. **Skill Prompting**: Load a Relay `.md` skill into your AI assistant.
-3. **Structured Review**: Feed the CLI's JSON report into your assistant. The AI evaluates the findings, executes the skill's specific checklist, and renders a standard report with a clear **SHIP/HOLD** decision.
-
----
-
-## 📦 Installation & Setup
-
-### 1. Install the CLI
-Install Relay globally or as a project dev-dependency:
+## Install
 
 ```bash
-# Globally
 npm install -g @relay/cli
-
-# Or per-project (recommended)
-pnpm add -D @relay/cli
 ```
 
-### 2. Initialize Config
-Scaffold a default config file (`.relayrc.json`) in your project root:
+Then scaffold a config and verify your environment:
+
 ```bash
 relay init
-```
-
-### 3. Diagnose Setup
-Run a doctor diagnostic to ensure the environment is valid:
-```bash
 relay doctor
 ```
 
 ---
 
-## 🧠 Installing Skills in AI Assistants
+## Install Skills
 
-To make your AI assistant follow the Relay methodology, load the corresponding `SKILL.md` rules into its instructions.
-
-| Assistant | How to Install |
-| :--- | :--- |
-| **Cursor / Windsurf** | Copy the text of a skill and append it to your `.cursorrules` or `.windsurfrules` file. |
-| **Claude Projects** | Upload the skill's `.md` file to your project's **Custom Instructions** or **Project Knowledge**. |
-| **Copilot / ChatGPT** | Save the skill's `.md` file in your repository under `.github/copilot-instructions.md` or paste it directly in the system prompt instructions. |
-
----
-
-## 🛠️ Slash Commands
-
-Use these commands directly in your AI assistant prompt to initiate specific reviews:
-
-### `/qa` — Full Quality Assurance Review
-Triggers a complete audit across all categories. Checks security, test coverage, code structure, performance, and release metadata.
-- **Workflow file**: [`skills/qa/SKILL.md`](./skills/qa/SKILL.md)
-- **CLI equivalent**: `relay review`
-
-### `/security` — OWASP Top 10 Audit
-Focuses entirely on security vulnerabilities, hardcoded secrets, input sanitization, dynamic code execution, and secure configuration.
-- **Workflow file**: [`skills/security/SKILL.md`](./skills/security/SKILL.md)
-- **CLI equivalent**: `relay security`
-
-### `/release` — Release Readiness Check
-Gates code changes before shipping to production. Verifies version bumps, changelog updates, and test suite integrity.
-- **Workflow file**: [`skills/release/SKILL.md`](./skills/release/SKILL.md)
-- **CLI equivalent**: `relay release`
-
-### `/architecture` — Clean Code & Coupling Audit
-Evaluates project modularity. Detects high coupling, circular references, God files, and deprecated APIs.
-- **Workflow file**: [`skills/architecture/SKILL.md`](./skills/architecture/SKILL.md)
-- **CLI equivalent**: `relay architecture`
-
-### `/performance` — Performance & Bundle Size Audit
-Identifies large monolithic imports (like Moment or Lodash), unoptimized asset tags, and client-side rendering bottlenecks.
-- **Workflow file**: [`skills/performance/SKILL.md`](./skills/performance/SKILL.md)
-- **CLI equivalent**: `relay performance`
-
-### `/testing` — Test Quality & Coverage Verification
-Analyzes test suite configurations, placeholder tests, skipped/focused tests (`.only` / `.skip`), and assertion validity.
-- **Workflow file**: [`skills/testing/SKILL.md`](./skills/testing/SKILL.md)
-- **CLI equivalent**: `relay review --categories testing`
-
----
-
-## 📊 CLI Formatting Options
-
-You can render Relay results in multiple presentation layers depending on your environment:
+Run this once inside any project to load all Relay skills into your AI assistant automatically:
 
 ```bash
-# Rich colored terminal UI (default)
-relay review --format terminal
+relay install-skills
+```
 
-# Compact JSON for automation / MCP tool integration
+This detects which assistant you are using (Cursor, Claude Code, Copilot, etc.) and writes the correct skill files to the right location. No manual copy-paste needed.
+
+---
+
+## Skills
+
+| Slash Command | What it does |
+| :--- | :--- |
+| `/qa` | Full audit — security, tests, structure, performance, release metadata |
+| `/security` | OWASP Top 10 scan — secrets, injection, unsafe config |
+| `/release` | Pre-ship gate — version bump, changelog, test suite |
+| `/architecture` | Coupling, circular deps, God files, deprecated APIs |
+| `/performance` | Bundle size, unoptimized assets, render bottlenecks |
+| `/testing` | Coverage, placeholder tests, skipped/focused tests |
+
+---
+
+## CLI Review
+
+Run a scan and pipe the results into your AI assistant:
+
+```bash
+# Default — rich terminal output
+relay review
+
+# JSON — for piping into AI or automation
 relay review --format json
 
-# Github-flavored markdown for pipelines
+# Markdown — for PRs and pipelines
 relay review --format markdown
 
-# Clean Standalone HTML page with tailored statistics
+# HTML report
 relay review --format html --output report.html
 
-# SARIF v2.1.0 for GitHub Advanced Security Scanning
+# SARIF — for GitHub Advanced Security
 relay review --format sarif --output relay-results.sarif
 
-# Collapsed PR summary comment format
+# GitHub PR comment format
 relay review --format github
 ```
 
 ---
 
-## ⚡ Core Philosophy: Trust-First
+## How It Works
 
-Relay enforces a **read-only analysis policy** in `v1`. 
+1. Run `relay review` to get a clean, deterministic scan of your codebase.
+2. Your AI assistant reads the findings using the loaded skill.
+3. It applies the skill's checklist and returns a structured report with a **SHIP / HOLD** decision.
 
-* **No Automatic Code Modification**: The engine identifies findings, provides line evidence, explains risks, and suggests fixes—but it never modifies your files automatically.
-* **Why?** Trust in analysis must precede automation. Once developers trust the recommendations, V2 will introduce AI-generated fix recommendations, and V3 will introduce `relay fix` with an explicit approval terminal.
+Relay never modifies your code. It reads, reports, and recommends.
 
 ---
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./docs/CONTRIBUTING.md) to set up the workspace, add rules, or build custom reporters.
 
 MIT © Relay Contributors
