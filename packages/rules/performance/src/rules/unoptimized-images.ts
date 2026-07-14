@@ -10,7 +10,8 @@ export const unoptimizedImagesRule: Rule = {
   category: 'performance',
   severity: 'medium',
   description: 'Identify unoptimized images or missing image lazy loading',
-  rationale: 'Images are typically the largest assets on a web page. In Next.js, using standard <img> instead of next/image bypasses automated resizing, optimization, and modern format delivery. In static sites, missing loading="lazy" causes browsers to download off-screen images prematurely.',
+  rationale:
+    'Images are typically the largest assets on a web page. In Next.js, using standard <img> instead of next/image bypasses automated resizing, optimization, and modern format delivery. In static sites, missing loading="lazy" causes browsers to download off-screen images prematurely.',
   docs: 'https://relay.dev/rules/PERF-002',
   tags: ['performance', 'lcp', 'images'],
 
@@ -25,9 +26,9 @@ export const unoptimizedImagesRule: Rule = {
       if (!jsHtmlLike.has(file.extension)) continue;
 
       imgPattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
-
-      while ((match = imgPattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = imgPattern.exec(file.content);
+        if (match === null) break;
         const tagContent = match[1] ?? '';
         const line = file.content.slice(0, match.index).split('\n').length;
 
@@ -40,7 +41,8 @@ export const unoptimizedImagesRule: Rule = {
             file: file.relativePath,
             line,
             evidence: match[0].trim().replace(/\s+/g, ' '),
-            suggestion: 'Import and use the Image component from "next/image" to auto-optimize sizes and formats.',
+            suggestion:
+              'Import and use the Image component from "next/image" to auto-optimize sizes and formats.',
             docs: 'https://relay.dev/rules/PERF-002',
           });
         } else {
@@ -57,7 +59,8 @@ export const unoptimizedImagesRule: Rule = {
               file: file.relativePath,
               line,
               evidence: match[0].trim().replace(/\s+/g, ' '),
-              suggestion: 'Add loading="lazy" for below-the-fold images, or fetchpriority="high" for the Largest Contentful Paint (LCP) hero image.',
+              suggestion:
+                'Add loading="lazy" for below-the-fold images, or fetchpriority="high" for the Largest Contentful Paint (LCP) hero image.',
               docs: 'https://relay.dev/rules/PERF-002',
             });
           }

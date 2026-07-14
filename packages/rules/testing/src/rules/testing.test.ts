@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import type { ProjectContext } from '@relay/shared';
+import { describe, expect, it } from 'vitest';
 import { emptyTestsRule } from './empty-tests.js';
 import { noTestsRule } from './no-tests.js';
 import { skippedFocusedTestsRule } from './skipped-focused-tests.js';
-import type { ProjectContext } from '@relay/shared';
 
 function buildCtx(
   files: Array<{ path: string; content: string }>,
@@ -13,7 +13,7 @@ function buildCtx(
     framework: 'react',
     allFrameworks: ['react'],
     packageJson: null,
-    dependencies: deps.map(d => ({ ...d, isPeer: false })),
+    dependencies: deps.map((d) => ({ ...d, isPeer: false })),
     sourceFiles: files.map((f) => ({
       path: `/test/${f.path}`,
       relativePath: f.path,
@@ -51,7 +51,9 @@ describe('Testing Rules', () => {
     });
 
     it('does not flag valid test files', async () => {
-      const ctx = buildCtx([{ path: 'App.test.ts', content: 'describe("App", () => { it("works", () => {}) })' }]);
+      const ctx = buildCtx([
+        { path: 'App.test.ts', content: 'describe("App", () => { it("works", () => {}) })' },
+      ]);
       const findings = await emptyTestsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
@@ -67,7 +69,10 @@ describe('Testing Rules', () => {
     });
 
     it('flags when framework installed but no test files found', async () => {
-      const ctx = buildCtx([{ path: 'App.ts', content: 'const a = 1;' }], [{ name: 'vitest', version: '^1.0.0', isDev: true }]);
+      const ctx = buildCtx(
+        [{ path: 'App.ts', content: 'const a = 1;' }],
+        [{ name: 'vitest', version: '^1.0.0', isDev: true }]
+      );
       const findings = await noTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-002');
@@ -75,7 +80,10 @@ describe('Testing Rules', () => {
     });
 
     it('does not flag when test files exist', async () => {
-      const ctx = buildCtx([{ path: 'App.test.ts', content: 'test("a", () => {})' }], [{ name: 'vitest', version: '^1.0.0', isDev: true }]);
+      const ctx = buildCtx(
+        [{ path: 'App.test.ts', content: 'test("a", () => {})' }],
+        [{ name: 'vitest', version: '^1.0.0', isDev: true }]
+      );
       const findings = await noTestsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });

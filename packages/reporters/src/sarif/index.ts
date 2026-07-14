@@ -12,7 +12,10 @@ export class SarifReporter implements Reporter {
   name = 'sarif';
 
   render(result: ReviewResult): string {
-    const rulesMap = new Map<string, { id: string; name: string; shortDescription: { text: string } }>();
+    const rulesMap = new Map<
+      string,
+      { id: string; name: string; shortDescription: { text: string } }
+    >();
 
     // Collect all unique rules that were triggered
     for (const finding of result.findings) {

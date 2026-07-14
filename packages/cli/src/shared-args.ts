@@ -1,4 +1,4 @@
-import type { RuleCategory, Severity, RunOptions, Framework } from '@relay/shared';
+import type { Framework, RuleCategory, RunOptions, Severity } from '@relay/shared';
 
 /**
  * Common CLI args shared across all review commands.

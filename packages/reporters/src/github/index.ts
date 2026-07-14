@@ -26,7 +26,9 @@ export class GithubReporter implements Reporter {
     const statusLabel = result.status.toUpperCase();
     lines.push(`## ${statusIcon} Relay Code Quality Review — **${statusLabel}**`);
     lines.push('');
-    lines.push(`**Score:** \`${result.score}/100\` | **Framework:** \`${result.framework}\` | **Rules Checked:** \`${result.rulesRun}\``);
+    lines.push(
+      `**Score:** \`${result.score}/100\` | **Framework:** \`${result.framework}\` | **Rules Checked:** \`${result.rulesRun}\``
+    );
     lines.push('');
     lines.push('---');
     lines.push('');
@@ -38,7 +40,9 @@ export class GithubReporter implements Reporter {
     lines.push('| :--- | :--- | :--- | :--- |');
     for (const cat of result.categoryScores) {
       const catIcon = cat.status === 'pass' ? '✅' : cat.status === 'warn' ? '⚠️' : '❌';
-      lines.push(`| **${cat.category}** | ${cat.score}/${cat.maxScore} | ${cat.findingCount} | ${catIcon} ${cat.status} |`);
+      lines.push(
+        `| **${cat.category}** | ${cat.score}/${cat.maxScore} | ${cat.findingCount} | ${catIcon} ${cat.status} |`
+      );
     }
     lines.push('');
 
@@ -67,7 +71,9 @@ export class GithubReporter implements Reporter {
 
     if (rest.length > 0) {
       lines.push('<details>');
-      lines.push(`<summary><b>🔍 View Medium & Low Priority Findings (${rest.length})</b></summary>`);
+      lines.push(
+        `<summary><b>🔍 View Medium & Low Priority Findings (${rest.length})</b></summary>`
+      );
       lines.push('');
       for (const f of rest) {
         this.renderFindingLine(lines, f);

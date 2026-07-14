@@ -10,7 +10,8 @@ export const missingAltTextRule: Rule = {
   category: 'accessibility',
   severity: 'high',
   description: 'Ensure all <img> elements have an alt attribute for screen readers',
-  rationale: 'Screen readers read the alt attribute to describe images to visually impaired users. Missing alt attributes cause screen readers to announce the file path or ignore the image entirely.',
+  rationale:
+    'Screen readers read the alt attribute to describe images to visually impaired users. Missing alt attributes cause screen readers to announce the file path or ignore the image entirely.',
   docs: 'https://relay.dev/rules/A11Y-001',
   tags: ['wcag-1.1.1', 'a11y', 'html'],
 
@@ -25,9 +26,9 @@ export const missingAltTextRule: Rule = {
       if (!jsHtmlLike.has(file.extension)) continue;
 
       imgPattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
-
-      while ((match = imgPattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = imgPattern.exec(file.content);
+        if (match === null) break;
         const tagContent = match[1] ?? '';
 
         // Check if "alt=" is present in the tag content
@@ -44,7 +45,8 @@ export const missingAltTextRule: Rule = {
             file: file.relativePath,
             line,
             evidence: match[0].trim().replace(/\s+/g, ' '),
-            suggestion: 'Add an alt attribute describing the image (e.g. alt="Company Logo"), or alt="" if the image is purely decorative.',
+            suggestion:
+              'Add an alt attribute describing the image (e.g. alt="Company Logo"), or alt="" if the image is purely decorative.',
             docs: 'https://relay.dev/rules/A11Y-001',
           });
         }

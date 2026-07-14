@@ -77,9 +77,9 @@ export const hardcodedSecretsRule: Rule = {
 
       for (const { pattern, label } of patterns) {
         pattern.lastIndex = 0;
-        let match: RegExpExecArray | null;
-
-        while ((match = pattern.exec(file.content)) !== null) {
+        while (true) {
+          const match = pattern.exec(file.content);
+          if (match === null) break;
           const lineIndex = file.content.slice(0, match.index).split('\n').length - 1;
           const lineContent = file.lines[lineIndex] ?? '';
 

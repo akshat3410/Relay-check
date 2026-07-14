@@ -74,7 +74,9 @@ describe('SEC-001: Hardcoded Secrets', () => {
     ]);
     const findings = await hardcodedSecretsRule.execute(ctx);
     expect(findings.length).toBeGreaterThan(0);
-    const f = findings[0]!;
+    const f = findings[0];
+    expect(f).toBeDefined();
+    if (!f) return;
     expect(f.ruleId).toBe('SEC-001');
     expect(f.file).toBe('src/api.ts');
     expect(f.line).toBeTypeOf('number');

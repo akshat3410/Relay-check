@@ -10,7 +10,8 @@ export const skippedFocusedTestsRule: Rule = {
   category: 'testing',
   severity: 'high',
   description: 'Detect focused (.only) or skipped (.skip) tests in test files',
-  rationale: 'Using .only runs only that specific test/describe block, bypassing the rest of the test suite and hiding regressions. Using .skip bypasses test verification for features, risking silent regressions.',
+  rationale:
+    'Using .only runs only that specific test/describe block, bypassing the rest of the test suite and hiding regressions. Using .skip bypasses test verification for features, risking silent regressions.',
   docs: 'https://relay.dev/rules/TEST-003',
   tags: ['testing', 'test-quality'],
 
@@ -34,8 +35,9 @@ export const skippedFocusedTestsRule: Rule = {
       // Check for focused tests (.only) - Critical/High because they disable the rest of the suite
       for (const pattern of focusedPatterns) {
         pattern.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = pattern.exec(file.content)) !== null) {
+        while (true) {
+          const match = pattern.exec(file.content);
+          if (match === null) break;
           const line = file.content.slice(0, match.index).split('\n').length;
           const lineContent = file.lines[line - 1] ?? '';
 
@@ -50,7 +52,8 @@ export const skippedFocusedTestsRule: Rule = {
             file: file.relativePath,
             line,
             evidence: match[0],
-            suggestion: 'Remove .only / fit / fdescribe before committing to ensure the entire test suite runs.',
+            suggestion:
+              'Remove .only / fit / fdescribe before committing to ensure the entire test suite runs.',
             docs: 'https://relay.dev/rules/TEST-003',
           });
         }
@@ -59,8 +62,9 @@ export const skippedFocusedTestsRule: Rule = {
       // Check for skipped tests (.skip) - Medium/Low
       for (const pattern of skippedPatterns) {
         pattern.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = pattern.exec(file.content)) !== null) {
+        while (true) {
+          const match = pattern.exec(file.content);
+          if (match === null) break;
           const line = file.content.slice(0, match.index).split('\n').length;
           const lineContent = file.lines[line - 1] ?? '';
 
@@ -75,7 +79,8 @@ export const skippedFocusedTestsRule: Rule = {
             file: file.relativePath,
             line,
             evidence: match[0],
-            suggestion: 'Fix the failing test and re-enable it, or delete the test if it is no longer relevant.',
+            suggestion:
+              'Fix the failing test and re-enable it, or delete the test if it is no longer relevant.',
             docs: 'https://relay.dev/rules/TEST-003',
           });
         }

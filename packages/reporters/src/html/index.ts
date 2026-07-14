@@ -20,7 +20,12 @@ export class HtmlReporter implements Reporter {
 
   render(result: ReviewResult): string {
     const timestamp = new Date(result.timestamp).toLocaleString();
-    const scoreColor = result.score >= 80 ? 'text-green-600' : result.score >= 60 ? 'text-yellow-600' : 'text-red-600';
+    const scoreColor =
+      result.score >= 80
+        ? 'text-green-600'
+        : result.score >= 60
+          ? 'text-yellow-600'
+          : 'text-red-600';
 
     const categoriesHtml = result.categoryScores
       .map((cat) => {

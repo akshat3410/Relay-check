@@ -25,9 +25,9 @@ export const httpsEnforcementRule: Rule = {
       if (file.relativePath.includes('test') || file.relativePath.includes('spec')) continue;
 
       const httpPattern = /http:\/\/(?!localhost|127\.0\.0\.1|0\.0\.0\.0|::1)[a-zA-Z0-9]/g;
-      let match: RegExpExecArray | null;
-
-      while ((match = httpPattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = httpPattern.exec(file.content);
+        if (match === null) break;
         const line = file.content.slice(0, match.index).split('\n').length;
         findings.push({
           ruleId: 'SEC-002',
@@ -192,8 +192,9 @@ export const evalUsageRule: Rule = {
 
       for (const pattern of evalPatterns) {
         pattern.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = pattern.exec(file.content)) !== null) {
+        while (true) {
+          const match = pattern.exec(file.content);
+          if (match === null) break;
           const line = file.content.slice(0, match.index).split('\n').length;
           const lineContent = (file.lines[line - 1] ?? '').trim();
           if (lineContent.startsWith('//') || lineContent.startsWith('*')) continue;
@@ -249,8 +250,9 @@ export const sqlInjectionRule: Rule = {
 
       for (const pattern of patterns) {
         pattern.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = pattern.exec(file.content)) !== null) {
+        while (true) {
+          const match = pattern.exec(file.content);
+          if (match === null) break;
           const line = file.content.slice(0, match.index).split('\n').length;
           findings.push({
             ruleId: 'SEC-006',
@@ -338,8 +340,9 @@ export const consoleLogSecretsRule: Rule = {
       if (file.relativePath.includes('test') || file.relativePath.includes('spec')) continue;
 
       pattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
-      while ((match = pattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = pattern.exec(file.content);
+        if (match === null) break;
         const line = file.content.slice(0, match.index).split('\n').length;
         findings.push({
           ruleId: 'SEC-008',
@@ -451,8 +454,9 @@ export const prototypePollutionRule: Rule = {
 
       for (const pattern of patterns) {
         pattern.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = pattern.exec(file.content)) !== null) {
+        while (true) {
+          const match = pattern.exec(file.content);
+          if (match === null) break;
           const line = file.content.slice(0, match.index).split('\n').length;
           findings.push({
             ruleId: 'SEC-010',

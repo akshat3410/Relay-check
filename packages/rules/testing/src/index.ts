@@ -8,9 +8,9 @@ const pack: RulePack = {
   version: '0.1.0',
   docs: 'https://relay.dev/rules/testing',
   rules: [
-    emptyTestsRule,            // TEST-001
-    noTestsRule,               // TEST-002
-    skippedFocusedTestsRule,   // TEST-003
+    emptyTestsRule, // TEST-001
+    noTestsRule, // TEST-002
+    skippedFocusedTestsRule, // TEST-003
   ],
 };
 

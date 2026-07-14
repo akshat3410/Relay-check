@@ -10,7 +10,8 @@ export const deprecatedDepsRule: Rule = {
   category: 'architecture',
   severity: 'high',
   description: 'Identify deprecated, insecure, or unmaintained package dependencies',
-  rationale: 'Using deprecated libraries (such as tslint or request) exposes projects to security issues, limits future runtime upgrades, and degrades maintainability as community support ceases.',
+  rationale:
+    'Using deprecated libraries (such as tslint or request) exposes projects to security issues, limits future runtime upgrades, and degrades maintainability as community support ceases.',
   docs: 'https://relay.dev/rules/ARCH-003',
   tags: ['architecture', 'dependencies', 'security'],
 

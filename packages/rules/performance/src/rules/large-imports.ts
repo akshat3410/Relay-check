@@ -10,7 +10,8 @@ export const largeImportsRule: Rule = {
   category: 'performance',
   severity: 'medium',
   description: 'Identify monolithic imports of large packages like lodash or moment',
-  rationale: 'Importing the entire lodash or moment library pulls in the entire bundle, costing hundreds of kilobytes. Lodash should be imported by individual modules, and moment is deprecated and should be replaced with lighter alternatives like dayjs, luxon, or date-fns.',
+  rationale:
+    'Importing the entire lodash or moment library pulls in the entire bundle, costing hundreds of kilobytes. Lodash should be imported by individual modules, and moment is deprecated and should be replaced with lighter alternatives like dayjs, luxon, or date-fns.',
   docs: 'https://relay.dev/rules/PERF-003',
   tags: ['performance', 'bundle-size', 'imports'],
 
@@ -20,11 +21,13 @@ export const largeImportsRule: Rule = {
 
     // import _ from 'lodash' or import * as _ from 'lodash' or const _ = require('lodash')
     const lodashPattern = /import\s+[^;]*\b(?:_)\b[^;]*\s+from\s+['"]lodash['"]/g;
-    const lodashRequirePattern = /(?:const|let|var)\s+\b(?:_)\b\s*=\s*require\s*\(\s*['"]lodash['"]\s*\)/g;
+    const lodashRequirePattern =
+      /(?:const|let|var)\s+\b(?:_)\b\s*=\s*require\s*\(\s*['"]lodash['"]\s*\)/g;
 
     // import moment from 'moment' or const moment = require('moment')
     const momentPattern = /import\s+[^;]*\b(?:moment)\b[^;]*\s+from\s+['"]moment['"]/g;
-    const momentRequirePattern = /(?:const|let|var)\s+\bmoment\b\s*=\s*require\s*\(\s*['"]moment['"]\s*\)/g;
+    const momentRequirePattern =
+      /(?:const|let|var)\s+\bmoment\b\s*=\s*require\s*\(\s*['"]moment['"]\s*\)/g;
 
     for (const file of ctx.sourceFiles) {
       if (!jsLike.has(file.extension)) continue;
@@ -32,10 +35,11 @@ export const largeImportsRule: Rule = {
       // Check Lodash
       lodashPattern.lastIndex = 0;
       lodashRequirePattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
+      const lodashMatch =
+        lodashPattern.exec(file.content) ?? lodashRequirePattern.exec(file.content);
 
-      if ((match = lodashPattern.exec(file.content)) !== null || (match = lodashRequirePattern.exec(file.content)) !== null) {
-        const line = file.content.slice(0, match.index).split('\n').length;
+      if (lodashMatch !== null) {
+        const line = file.content.slice(0, lodashMatch.index).split('\n').length;
         findings.push({
           ruleId: 'PERF-003',
           severity: 'medium',
@@ -43,8 +47,9 @@ export const largeImportsRule: Rule = {
           message: 'Monolithic lodash import detected',
           file: file.relativePath,
           line,
-          evidence: match[0],
-          suggestion: 'Import individual lodash methods to support tree-shaking: e.g. import map from "lodash/map" instead of import _ from "lodash".',
+          evidence: lodashMatch[0],
+          suggestion:
+            'Import individual lodash methods to support tree-shaking: e.g. import map from "lodash/map" instead of import _ from "lodash".',
           docs: 'https://relay.dev/rules/PERF-003',
         });
       }
@@ -52,9 +57,11 @@ export const largeImportsRule: Rule = {
       // Check Moment
       momentPattern.lastIndex = 0;
       momentRequirePattern.lastIndex = 0;
+      const momentMatch =
+        momentPattern.exec(file.content) ?? momentRequirePattern.exec(file.content);
 
-      if ((match = momentPattern.exec(file.content)) !== null || (match = momentRequirePattern.exec(file.content)) !== null) {
-        const line = file.content.slice(0, match.index).split('\n').length;
+      if (momentMatch !== null) {
+        const line = file.content.slice(0, momentMatch.index).split('\n').length;
         findings.push({
           ruleId: 'PERF-003',
           severity: 'medium',
@@ -62,8 +69,9 @@ export const largeImportsRule: Rule = {
           message: 'Moment.js import detected',
           file: file.relativePath,
           line,
-          evidence: match[0],
-          suggestion: 'Moment.js is legacy and non-tree-shakable. Migrate to modern, lighter alternatives like dayjs, date-fns, or native Intl API.',
+          evidence: momentMatch[0],
+          suggestion:
+            'Moment.js is legacy and non-tree-shakable. Migrate to modern, lighter alternatives like dayjs, date-fns, or native Intl API.',
           docs: 'https://relay.dev/rules/PERF-003',
         });
       }

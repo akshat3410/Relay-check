@@ -9,8 +9,10 @@ export const missingInputLabelsRule: Rule = {
   name: 'Missing Form Input Labels',
   category: 'accessibility',
   severity: 'high',
-  description: 'Ensure all form inputs have associated labels, aria-label, or aria-labelledby attributes',
-  rationale: 'Screen readers need a programmatic connection between a form input and its label to announce the input\'s purpose correctly.',
+  description:
+    'Ensure all form inputs have associated labels, aria-label, or aria-labelledby attributes',
+  rationale:
+    "Screen readers need a programmatic connection between a form input and its label to announce the input's purpose correctly.",
   docs: 'https://relay.dev/rules/A11Y-002',
   tags: ['wcag-1.3.1', 'wcag-3.3.2', 'a11y', 'html'],
 
@@ -26,9 +28,9 @@ export const missingInputLabelsRule: Rule = {
 
       // Extract all declared labels in the file to map their 'for' attributes
       const declaredLabelIds = new Set<string>();
-      let labelMatch: RegExpExecArray | null;
-      labelForPattern.lastIndex = 0;
-      while ((labelMatch = labelForPattern.exec(file.content)) !== null) {
+      while (true) {
+        const labelMatch = labelForPattern.exec(file.content);
+        if (labelMatch === null) break;
         if (labelMatch[1]) {
           declaredLabelIds.add(labelMatch[1]);
         }
@@ -36,9 +38,10 @@ export const missingInputLabelsRule: Rule = {
 
       // Scan input tags
       inputPattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
 
-      while ((match = inputPattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = inputPattern.exec(file.content);
+        if (match === null) break;
         const tagContent = match[1] ?? '';
 
         // Ignore inputs that do not need labels
@@ -49,8 +52,10 @@ export const missingInputLabelsRule: Rule = {
         }
 
         // Check label association
-        const hasAriaLabel = /\baria-label\s*=/i.test(tagContent) || /:\baria-label\s*=/i.test(tagContent);
-        const hasAriaLabelledBy = /\baria-labelledby\s*=/i.test(tagContent) || /:\baria-labelledby\s*=/i.test(tagContent);
+        const hasAriaLabel =
+          /\baria-label\s*=/i.test(tagContent) || /:\baria-label\s*=/i.test(tagContent);
+        const hasAriaLabelledBy =
+          /\baria-labelledby\s*=/i.test(tagContent) || /:\baria-labelledby\s*=/i.test(tagContent);
 
         // Extract ID to check if a <label for="ID"> exists
         const idMatch = /\bid\s*=\s*["']([^"']+)["']/i.exec(tagContent);
@@ -74,7 +79,8 @@ export const missingInputLabelsRule: Rule = {
             file: file.relativePath,
             line,
             evidence: match[0].trim().replace(/\s+/g, ' '),
-            suggestion: 'Add an id attribute and a matching <label for="id"> label, or add an aria-label attribute.',
+            suggestion:
+              'Add an id attribute and a matching <label for="id"> label, or add an aria-label attribute.',
             docs: 'https://relay.dev/rules/A11Y-002',
           });
         }

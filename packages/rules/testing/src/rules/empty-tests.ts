@@ -10,7 +10,8 @@ export const emptyTestsRule: Rule = {
   category: 'testing',
   severity: 'medium',
   description: 'Identify test files that contain no actual test suites or assertions',
-  rationale: 'Empty or skeleton test files artificially inflate test file counts and pass silently in CI, creating a false sense of security and test coverage.',
+  rationale:
+    'Empty or skeleton test files artificially inflate test file counts and pass silently in CI, creating a false sense of security and test coverage.',
   docs: 'https://relay.dev/rules/TEST-001',
   tags: ['testing', 'test-quality'],
 

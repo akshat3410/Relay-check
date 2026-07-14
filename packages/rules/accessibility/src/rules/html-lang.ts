@@ -10,7 +10,8 @@ export const missingHtmlLangRule: Rule = {
   category: 'accessibility',
   severity: 'high',
   description: 'Ensure the <html> element has a valid lang attribute',
-  rationale: 'Screen readers use the lang attribute to load the correct pronunciation rules and voice profiles. Without it, screen readers default to the user\'s default language, which may result in incorrect speech output.',
+  rationale:
+    "Screen readers use the lang attribute to load the correct pronunciation rules and voice profiles. Without it, screen readers default to the user's default language, which may result in incorrect speech output.",
   docs: 'https://relay.dev/rules/A11Y-003',
   tags: ['wcag-3.1.1', 'a11y', 'html'],
 
@@ -23,9 +24,9 @@ export const missingHtmlLangRule: Rule = {
       if (file.relativePath.includes('node_modules')) continue;
 
       const htmlTagPattern = /<html([\s\S]*?)>/gi;
-      let match: RegExpExecArray | null;
-
-      while ((match = htmlTagPattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = htmlTagPattern.exec(file.content);
+        if (match === null) break;
         const tagContent = match[1] ?? '';
         const hasLang = /\blang\s*=/i.test(tagContent);
 

@@ -1,5 +1,5 @@
 import type { RulePack } from '@relay/shared';
-import { missingDockerHealthcheckRule, dockerRunAsRootRule } from './rules/docker.js';
+import { dockerRunAsRootRule, missingDockerHealthcheckRule } from './rules/docker.js';
 
 const pack: RulePack = {
   name: '@relay/rules-deployment',
@@ -7,7 +7,7 @@ const pack: RulePack = {
   docs: 'https://relay.dev/rules/deployment',
   rules: [
     missingDockerHealthcheckRule, // DEPLOY-001
-    dockerRunAsRootRule,          // DEPLOY-002
+    dockerRunAsRootRule, // DEPLOY-002
   ],
 };
 

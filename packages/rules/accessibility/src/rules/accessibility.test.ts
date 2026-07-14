@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { missingAltTextRule } from './alt-text.js';
-import { missingInputLabelsRule } from './input-labels.js';
-import { missingHtmlLangRule } from './html-lang.js';
-import { emptyInteractiveRule } from './empty-interactive.js';
-import { missingIframeTitleRule } from './iframe-title.js';
 import type { ProjectContext } from '@relay/shared';
+import { describe, expect, it } from 'vitest';
+import { missingAltTextRule } from './alt-text.js';
+import { emptyInteractiveRule } from './empty-interactive.js';
+import { missingHtmlLangRule } from './html-lang.js';
+import { missingIframeTitleRule } from './iframe-title.js';
+import { missingInputLabelsRule } from './input-labels.js';
 
 function buildCtx(files: Array<{ path: string; content: string }>): ProjectContext {
   return {
@@ -41,7 +41,9 @@ describe('Accessibility Rules', () => {
     });
 
     it('does not flag image with alt attribute', async () => {
-      const ctx = buildCtx([{ path: 'App.tsx', content: '<img src="logo.png" alt="Company Logo" />' }]);
+      const ctx = buildCtx([
+        { path: 'App.tsx', content: '<img src="logo.png" alt="Company Logo" />' },
+      ]);
       const findings = await missingAltTextRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
@@ -62,19 +64,23 @@ describe('Accessibility Rules', () => {
     });
 
     it('does not flag input with matching label', async () => {
-      const ctx = buildCtx([{
-        path: 'Form.tsx',
-        content: `
+      const ctx = buildCtx([
+        {
+          path: 'Form.tsx',
+          content: `
           <label htmlFor="username">Username</label>
           <input type="text" id="username" />
         `,
-      }]);
+        },
+      ]);
       const findings = await missingInputLabelsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
 
     it('does not flag input with aria-label', async () => {
-      const ctx = buildCtx([{ path: 'Form.tsx', content: '<input type="text" aria-label="Search" />' }]);
+      const ctx = buildCtx([
+        { path: 'Form.tsx', content: '<input type="text" aria-label="Search" />' },
+      ]);
       const findings = await missingInputLabelsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
@@ -88,7 +94,9 @@ describe('Accessibility Rules', () => {
 
   describe('A11Y-003: Missing HTML lang Attribute', () => {
     it('flags html tag missing lang in html files', async () => {
-      const ctx = buildCtx([{ path: 'index.html', content: '<html><head></head><body></body></html>' }]);
+      const ctx = buildCtx([
+        { path: 'index.html', content: '<html><head></head><body></body></html>' },
+      ]);
       const findings = await missingHtmlLangRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('A11Y-003');
@@ -136,14 +144,21 @@ describe('Accessibility Rules', () => {
 
   describe('A11Y-005: Missing iframe Title', () => {
     it('flags iframe missing title attribute', async () => {
-      const ctx = buildCtx([{ path: 'App.tsx', content: '<iframe src="https://example.com"></iframe>' }]);
+      const ctx = buildCtx([
+        { path: 'App.tsx', content: '<iframe src="https://example.com"></iframe>' },
+      ]);
       const findings = await missingIframeTitleRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('A11Y-005');
     });
 
     it('does not flag iframe with title attribute', async () => {
-      const ctx = buildCtx([{ path: 'App.tsx', content: '<iframe src="https://example.com" title="Example map"></iframe>' }]);
+      const ctx = buildCtx([
+        {
+          path: 'App.tsx',
+          content: '<iframe src="https://example.com" title="Example map"></iframe>',
+        },
+      ]);
       const findings = await missingIframeTitleRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });

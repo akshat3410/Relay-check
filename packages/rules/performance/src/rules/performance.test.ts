@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import type { Framework, ProjectContext } from '@relay/shared';
+import { describe, expect, it } from 'vitest';
 import { devDepsInProdRule } from './dev-deps-in-prod.js';
-import { unoptimizedImagesRule } from './unoptimized-images.js';
 import { largeImportsRule } from './large-imports.js';
-import type { ProjectContext, Framework } from '@relay/shared';
+import { unoptimizedImagesRule } from './unoptimized-images.js';
 
 function buildCtx(
   files: Array<{ path: string; content: string }>,
@@ -14,7 +14,7 @@ function buildCtx(
     framework: frameworks[0] ?? 'react',
     allFrameworks: frameworks,
     packageJson: null,
-    dependencies: deps.map(d => ({ ...d, isPeer: false })),
+    dependencies: deps.map((d) => ({ ...d, isPeer: false })),
     sourceFiles: files.map((f) => ({
       path: `/test/${f.path}`,
       relativePath: f.path,
@@ -57,7 +57,11 @@ describe('Performance Rules', () => {
 
   describe('PERF-002: Unoptimized Images', () => {
     it('flags standard img in Next.js', async () => {
-      const ctx = buildCtx([{ path: 'pages/index.tsx', content: '<img src="logo.png" />' }], [], ['nextjs']);
+      const ctx = buildCtx(
+        [{ path: 'pages/index.tsx', content: '<img src="logo.png" />' }],
+        [],
+        ['nextjs']
+      );
       const findings = await unoptimizedImagesRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('PERF-002');
@@ -65,7 +69,11 @@ describe('Performance Rules', () => {
     });
 
     it('flags missing loading="lazy" in vanilla React', async () => {
-      const ctx = buildCtx([{ path: 'src/App.jsx', content: '<img src="banner.png" />' }], [], ['react']);
+      const ctx = buildCtx(
+        [{ path: 'src/App.jsx', content: '<img src="banner.png" />' }],
+        [],
+        ['react']
+      );
       const findings = await unoptimizedImagesRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('PERF-002');
@@ -73,7 +81,11 @@ describe('Performance Rules', () => {
     });
 
     it('does not flag img with loading="lazy"', async () => {
-      const ctx = buildCtx([{ path: 'src/App.jsx', content: '<img src="banner.png" loading="lazy" />' }], [], ['react']);
+      const ctx = buildCtx(
+        [{ path: 'src/App.jsx', content: '<img src="banner.png" loading="lazy" />' }],
+        [],
+        ['react']
+      );
       const findings = await unoptimizedImagesRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });

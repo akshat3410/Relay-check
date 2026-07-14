@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { missingReadmeRule, missingLicenseRule } from './hygiene.js';
 import type { ProjectContext } from '@relay/shared';
+import { describe, expect, it } from 'vitest';
+import { missingLicenseRule, missingReadmeRule } from './hygiene.js';
 
 function buildCtx(files: Array<{ path: string; content: string }>): ProjectContext {
   return {

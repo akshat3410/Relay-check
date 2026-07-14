@@ -9,8 +9,10 @@ export const deepImportsRule: Rule = {
   name: 'Deep Relative Imports',
   category: 'architecture',
   severity: 'low',
-  description: 'Detect excessively deep relative imports that suggest high coupling or poor module structure',
-  rationale: 'Deep relative imports (e.g. "../../../../util") create tight coupling between directories. They break easily during refactoring and suggest that the module boundary or project structure is not organized optimally. Using import aliases (like "@/components") is preferred.',
+  description:
+    'Detect excessively deep relative imports that suggest high coupling or poor module structure',
+  rationale:
+    'Deep relative imports (e.g. "../../../../util") create tight coupling between directories. They break easily during refactoring and suggest that the module boundary or project structure is not organized optimally. Using import aliases (like "@/components") is preferred.',
   docs: 'https://relay.dev/rules/ARCH-001',
   tags: ['architecture', 'maintainability'],
 
@@ -24,9 +26,9 @@ export const deepImportsRule: Rule = {
       if (!jsLike.has(file.extension)) continue;
 
       deepRelativePattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
-
-      while ((match = deepRelativePattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = deepRelativePattern.exec(file.content);
+        if (match === null) break;
         const line = file.content.slice(0, match.index).split('\n').length;
         findings.push({
           ruleId: 'ARCH-001',
@@ -36,7 +38,8 @@ export const deepImportsRule: Rule = {
           file: file.relativePath,
           line,
           evidence: match[0],
-          suggestion: 'Configure and use path aliases (e.g. "@/*" in tsconfig.json) to refer to root-level modules cleanly.',
+          suggestion:
+            'Configure and use path aliases (e.g. "@/*" in tsconfig.json) to refer to root-level modules cleanly.',
           docs: 'https://relay.dev/rules/ARCH-001',
         });
       }

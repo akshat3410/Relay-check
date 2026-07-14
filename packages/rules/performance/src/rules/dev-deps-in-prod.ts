@@ -10,7 +10,8 @@ export const devDepsInProdRule: Rule = {
   category: 'performance',
   severity: 'medium',
   description: 'Ensure development-only packages are not included in production dependencies',
-  rationale: 'Including compiler, test, or lint packages in production dependencies bloats the production node_modules, increases serverless cold start times, and slows down production builds/deployments.',
+  rationale:
+    'Including compiler, test, or lint packages in production dependencies bloats the production node_modules, increases serverless cold start times, and slows down production builds/deployments.',
   docs: 'https://relay.dev/rules/PERF-001',
   tags: ['dependencies', 'bundle-size', 'perf'],
 

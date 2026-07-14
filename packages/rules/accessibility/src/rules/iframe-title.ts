@@ -10,7 +10,8 @@ export const missingIframeTitleRule: Rule = {
   category: 'accessibility',
   severity: 'medium',
   description: 'Ensure all <iframe> elements have a non-empty title attribute',
-  rationale: 'Screen readers use the iframe title to let users know what the iframe contains without having to navigate into it.',
+  rationale:
+    'Screen readers use the iframe title to let users know what the iframe contains without having to navigate into it.',
   docs: 'https://relay.dev/rules/A11Y-005',
   tags: ['wcag-4.1.2', 'a11y', 'html'],
 
@@ -24,9 +25,9 @@ export const missingIframeTitleRule: Rule = {
       if (!jsHtmlLike.has(file.extension)) continue;
 
       iframePattern.lastIndex = 0;
-      let match: RegExpExecArray | null;
-
-      while ((match = iframePattern.exec(file.content)) !== null) {
+      while (true) {
+        const match = iframePattern.exec(file.content);
+        if (match === null) break;
         const tagContent = match[1] ?? '';
         const hasTitle = /\btitle\s*=/i.test(tagContent);
 
@@ -40,7 +41,8 @@ export const missingIframeTitleRule: Rule = {
             file: file.relativePath,
             line,
             evidence: match[0].trim().replace(/\s+/g, ' '),
-            suggestion: 'Add a descriptive title attribute to the iframe, e.g. title="Embedded Map" or title="Third-party Widget".',
+            suggestion:
+              'Add a descriptive title attribute to the iframe, e.g. title="Embedded Map" or title="Third-party Widget".',
             docs: 'https://relay.dev/rules/A11Y-005',
           });
         }

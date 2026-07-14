@@ -9,14 +9,28 @@ export const godFilesRule: Rule = {
   name: 'God Files (Large Modules)',
   category: 'architecture',
   severity: 'medium',
-  description: 'Identify exceptionally large files that may violate the Single Responsibility Principle',
-  rationale: 'Files with more than 1000 lines are harder to maintain, understand, and test. They often act as "God objects" containing unrelated logic that should be split into smaller, cohesive modules.',
+  description:
+    'Identify exceptionally large files that may violate the Single Responsibility Principle',
+  rationale:
+    'Files with more than 1000 lines are harder to maintain, understand, and test. They often act as "God objects" containing unrelated logic that should be split into smaller, cohesive modules.',
   docs: 'https://relay.dev/rules/ARCH-002',
   tags: ['architecture', 'complexity', 'maintainability'],
 
   execute(ctx: ProjectContext): Finding[] {
     const findings: Finding[] = [];
-    const jsLike = new Set(['ts', 'tsx', 'js', 'jsx', 'mjs', 'py', 'go', 'php', 'rb', 'java', 'cs']);
+    const jsLike = new Set([
+      'ts',
+      'tsx',
+      'js',
+      'jsx',
+      'mjs',
+      'py',
+      'go',
+      'php',
+      'rb',
+      'java',
+      'cs',
+    ]);
 
     for (const file of ctx.sourceFiles) {
       if (!jsLike.has(file.extension)) continue;
@@ -39,7 +53,8 @@ export const godFilesRule: Rule = {
           message: `Large module file detected: ${file.lines.length} lines of code`,
           file: file.relativePath,
           evidence: `Line count: ${file.lines.length}`,
-          suggestion: 'Refactor this module by breaking it down into smaller, focused files or helper modules.',
+          suggestion:
+            'Refactor this module by breaking it down into smaller, focused files or helper modules.',
           docs: 'https://relay.dev/rules/ARCH-002',
         });
       }

@@ -44,4 +44,5 @@ pnpm-debug.log*
 # Scratch/Temporary Files
 temp_config.json
 test_resolve.js
+cloned_repos/
 
