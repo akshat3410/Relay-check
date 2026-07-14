@@ -1,6 +1,7 @@
 import { defineCommand, runMain } from 'citty';
 import { doctorCommand } from './commands/doctor.js';
 import { initCommand } from './commands/init.js';
+import { installSkillsCommand } from './commands/install-skills.js';
 import {
   accessibilityCommand,
   architectureCommand,
@@ -28,6 +29,7 @@ const main = defineCommand({
     report: reportCommand,
     doctor: doctorCommand,
     init: initCommand,
+    'install-skills': installSkillsCommand,
     version: versionCommand,
   },
 });

@@ -1,3 +1,4 @@
+import { cpSync } from 'node:fs';
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
@@ -13,5 +14,12 @@ export default defineConfig({
   },
   define: {
     __RELAY_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.0'),
+  },
+  async onSuccess() {
+    try {
+      cpSync('../../skills', 'dist/skills', { recursive: true });
+    } catch (err) {
+      console.warn('Warning: Failed to copy skills directory:', err);
+    }
   },
 });
