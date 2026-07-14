@@ -13,7 +13,7 @@ function buildCtx(
     framework: 'react',
     allFrameworks: ['react'],
     packageJson: null,
-    dependencies: deps,
+    dependencies: deps.map(d => ({ ...d, isPeer: false })),
     sourceFiles: files.map((f) => ({
       path: `/test/${f.path}`,
       relativePath: f.path,
@@ -34,47 +34,47 @@ function buildCtx(
 
 describe('Architecture Rules', () => {
   describe('ARCH-001: Deep Relative Imports', () => {
-    it('flags imports that go 4+ levels up', () => {
+    it('flags imports that go 4+ levels up', async () => {
       const ctx = buildCtx([{ path: 'src/features/a/b/c/Component.tsx', content: 'import x from "../../../../utils";' }]);
-      const findings = deepImportsRule.execute(ctx);
+      const findings = await deepImportsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('ARCH-001');
     });
 
-    it('does not flag standard imports', () => {
+    it('does not flag standard imports', async () => {
       const ctx = buildCtx([{ path: 'src/features/a/Component.tsx', content: 'import x from "../utils";' }]);
-      const findings = deepImportsRule.execute(ctx);
+      const findings = await deepImportsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });
 
   describe('ARCH-002: God Files', () => {
-    it('flags files with >1000 lines', () => {
+    it('flags files with >1000 lines', async () => {
       const longLines = Array.from({ length: 1001 }, (_, i) => `// Line ${i}`).join('\n');
       const ctx = buildCtx([{ path: 'src/God.ts', content: longLines }]);
-      const findings = godFilesRule.execute(ctx);
+      const findings = await godFilesRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('ARCH-002');
     });
 
-    it('does not flag reasonably sized files', () => {
+    it('does not flag reasonably sized files', async () => {
       const ctx = buildCtx([{ path: 'src/App.ts', content: '// lines' }]);
-      const findings = godFilesRule.execute(ctx);
+      const findings = await godFilesRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });
 
   describe('ARCH-003: Deprecated Dependencies', () => {
-    it('flags request dependency', () => {
+    it('flags request dependency', async () => {
       const ctx = buildCtx([], [{ name: 'request', version: '^2.88.2', isDev: false }]);
-      const findings = deprecatedDepsRule.execute(ctx);
+      const findings = await deprecatedDepsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('ARCH-003');
     });
 
-    it('flags tslint dependency', () => {
+    it('flags tslint dependency', async () => {
       const ctx = buildCtx([], [{ name: 'tslint', version: '^6.1.3', isDev: true }]);
-      const findings = deprecatedDepsRule.execute(ctx);
+      const findings = await deprecatedDepsRule.execute(ctx);
       expect(findings).toHaveLength(1);
     });
   });

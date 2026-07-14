@@ -146,7 +146,7 @@ export interface Finding {
   /** Rule that produced this finding */
   ruleId: string;
   /** Rule name for human display */
-  ruleName: string;
+  ruleName?: string;
   /** Finding severity */
   severity: Severity;
   /** Rule category */

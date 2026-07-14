@@ -1,4 +1,4 @@
-import type { RuleCategory, RunOptions, Severity } from '@relay/shared';
+import type { RuleCategory, Severity, RunOptions, Framework } from '@relay/shared';
 
 /**
  * Common CLI args shared across all review commands.
@@ -64,12 +64,20 @@ export type SharedReviewArgs = {
  * Map CLI args → RelayEngine RunOptions
  */
 export function toRunOptions(args: SharedReviewArgs, categories?: RuleCategory[]): RunOptions {
-  return {
+  const opts: RunOptions = {
     cwd: args.cwd,
     severity: args.severity as Severity,
-    framework: args.framework as RunOptions['framework'],
-    categories,
   };
+
+  if (args.framework !== undefined) {
+    opts.framework = args.framework as Framework | 'auto';
+  }
+
+  if (categories !== undefined) {
+    opts.categories = categories;
+  }
+
+  return opts;
 }
 
 /**

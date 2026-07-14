@@ -13,7 +13,7 @@ function buildCtx(
     framework: 'react',
     allFrameworks: ['react'],
     packageJson: null,
-    dependencies: deps,
+    dependencies: deps.map(d => ({ ...d, isPeer: false })),
     sourceFiles: files.map((f) => ({
       path: `/test/${f.path}`,
       relativePath: f.path,
@@ -34,80 +34,80 @@ function buildCtx(
 
 describe('Testing Rules', () => {
   describe('TEST-001: Empty or Mock Test Files', () => {
-    it('flags completely empty test files', () => {
+    it('flags completely empty test files', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: '' }]);
-      const findings = emptyTestsRule.execute(ctx);
+      const findings = await emptyTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-001');
       expect(findings[0]?.severity).toBe('high');
     });
 
-    it('flags test files with no test declarations', () => {
+    it('flags test files with no test declarations', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: 'console.log("hello");' }]);
-      const findings = emptyTestsRule.execute(ctx);
+      const findings = await emptyTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-001');
       expect(findings[0]?.severity).toBe('medium');
     });
 
-    it('does not flag valid test files', () => {
+    it('does not flag valid test files', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: 'describe("App", () => { it("works", () => {}) })' }]);
-      const findings = emptyTestsRule.execute(ctx);
+      const findings = await emptyTestsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });
 
   describe('TEST-002: No Test Suite Configured', () => {
-    it('flags missing test setup completely', () => {
+    it('flags missing test setup completely', async () => {
       const ctx = buildCtx([{ path: 'App.ts', content: 'const a = 1;' }], []);
-      const findings = noTestsRule.execute(ctx);
+      const findings = await noTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-002');
       expect(findings[0]?.severity).toBe('high');
     });
 
-    it('flags when framework installed but no test files found', () => {
+    it('flags when framework installed but no test files found', async () => {
       const ctx = buildCtx([{ path: 'App.ts', content: 'const a = 1;' }], [{ name: 'vitest', version: '^1.0.0', isDev: true }]);
-      const findings = noTestsRule.execute(ctx);
+      const findings = await noTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-002');
       expect(findings[0]?.severity).toBe('medium');
     });
 
-    it('does not flag when test files exist', () => {
+    it('does not flag when test files exist', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: 'test("a", () => {})' }], [{ name: 'vitest', version: '^1.0.0', isDev: true }]);
-      const findings = noTestsRule.execute(ctx);
+      const findings = await noTestsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });
 
   describe('TEST-003: Focused or Skipped Tests', () => {
-    it('flags .only in test files', () => {
+    it('flags .only in test files', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: 'describe.only("App", () => {})' }]);
-      const findings = skippedFocusedTestsRule.execute(ctx);
+      const findings = await skippedFocusedTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-003');
       expect(findings[0]?.severity).toBe('high');
     });
 
-    it('flags fit in test files', () => {
+    it('flags fit in test files', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: 'fit("App", () => {})' }]);
-      const findings = skippedFocusedTestsRule.execute(ctx);
+      const findings = await skippedFocusedTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.severity).toBe('high');
     });
 
-    it('flags .skip in test files', () => {
+    it('flags .skip in test files', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: 'test.skip("App", () => {})' }]);
-      const findings = skippedFocusedTestsRule.execute(ctx);
+      const findings = await skippedFocusedTestsRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('TEST-003');
       expect(findings[0]?.severity).toBe('medium');
     });
 
-    it('does not flag commented out .only or .skip', () => {
+    it('does not flag commented out .only or .skip', async () => {
       const ctx = buildCtx([{ path: 'App.test.ts', content: '// test.skip("App", () => {})' }]);
-      const findings = skippedFocusedTestsRule.execute(ctx);
+      const findings = await skippedFocusedTestsRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });

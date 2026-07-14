@@ -29,38 +29,38 @@ function buildCtx(files: Array<{ path: string; content: string }>): ProjectConte
 
 describe('Deployment Rules', () => {
   describe('DEPLOY-001: Missing Docker HEALTHCHECK', () => {
-    it('flags Dockerfile missing HEALTHCHECK', () => {
+    it('flags Dockerfile missing HEALTHCHECK', async () => {
       const ctx = buildCtx([{ path: 'Dockerfile', content: 'FROM node:18\nCMD ["node", "index.js"]' }]);
-      const findings = missingDockerHealthcheckRule.execute(ctx);
+      const findings = await missingDockerHealthcheckRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('DEPLOY-001');
     });
 
-    it('does not flag Dockerfile with HEALTHCHECK', () => {
+    it('does not flag Dockerfile with HEALTHCHECK', async () => {
       const ctx = buildCtx([{ path: 'Dockerfile', content: 'FROM node:18\nHEALTHCHECK CMD curl http://localhost || exit 1\nCMD ["node", "index.js"]' }]);
-      const findings = missingDockerHealthcheckRule.execute(ctx);
+      const findings = await missingDockerHealthcheckRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });
 
   describe('DEPLOY-002: Docker Run As Root', () => {
-    it('flags Dockerfile with no USER directive', () => {
+    it('flags Dockerfile with no USER directive', async () => {
       const ctx = buildCtx([{ path: 'Dockerfile', content: 'FROM node:18\nCMD ["node", "index.js"]' }]);
-      const findings = dockerRunAsRootRule.execute(ctx);
+      const findings = await dockerRunAsRootRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.ruleId).toBe('DEPLOY-002');
     });
 
-    it('flags Dockerfile with USER root', () => {
+    it('flags Dockerfile with USER root', async () => {
       const ctx = buildCtx([{ path: 'Dockerfile', content: 'FROM node:18\nUSER root\nCMD ["node", "index.js"]' }]);
-      const findings = dockerRunAsRootRule.execute(ctx);
+      const findings = await dockerRunAsRootRule.execute(ctx);
       expect(findings).toHaveLength(1);
       expect(findings[0]?.message).toContain('explicitly sets USER to root');
     });
 
-    it('does not flag Dockerfile with non-root USER', () => {
+    it('does not flag Dockerfile with non-root USER', async () => {
       const ctx = buildCtx([{ path: 'Dockerfile', content: 'FROM node:18\nUSER node\nCMD ["node", "index.js"]' }]);
-      const findings = dockerRunAsRootRule.execute(ctx);
+      const findings = await dockerRunAsRootRule.execute(ctx);
       expect(findings).toHaveLength(0);
     });
   });
