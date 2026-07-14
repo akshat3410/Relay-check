@@ -7,29 +7,13 @@ import { createConsola } from 'consola';
 
 const logger = createConsola({ level: 4 });
 
-export const installSkillsCommand = defineCommand({
-  meta: {
-    name: 'install-skills',
-    description: 'Automatically install Relay agent skills into AI assistant configuration directories',
-  },
-  args: {
-    cwd: {
-      type: 'string' as const,
-      description: 'Project root directory',
-      default: process.cwd(),
-    },
-    providers: {
-      type: 'string' as const,
-      description: 'Comma-separated assistant providers to install for (cursor, claude, copilot, agents, all)',
-      default: 'all',
-    },
-    global: {
-      type: 'boolean' as const,
-      description: 'Install Claude skills globally (~/.claude/skills)',
-      default: false,
-    },
-  },
-  async run({ args }) {
+interface InstallSkillsArgs {
+  cwd: string;
+  providers: string;
+  global: boolean;
+}
+
+export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
     const cwd = args.cwd;
     const providerList = args.providers.split(',').map((p) => p.trim().toLowerCase());
     const isAll = providerList.includes('all');
@@ -189,6 +173,32 @@ export const installSkillsCommand = defineCommand({
       }
     }
 
-    console.log('\n  Relay Skill Installation Complete!\n');
+  console.log('\n  Relay Skill Installation Complete!\n');
+}
+
+export const installSkillsCommand = defineCommand({
+  meta: {
+    name: 'install-skills',
+    description: 'Automatically install Relay agent skills into AI assistant configuration directories',
+  },
+  args: {
+    cwd: {
+      type: 'string' as const,
+      description: 'Project root directory',
+      default: process.cwd(),
+    },
+    providers: {
+      type: 'string' as const,
+      description: 'Comma-separated assistant providers to install for (cursor, claude, copilot, agents, all)',
+      default: 'all',
+    },
+    global: {
+      type: 'boolean' as const,
+      description: 'Install Claude skills globally (~/.claude/skills)',
+      default: false,
+    },
+  },
+  async run({ args }) {
+    await runInstallSkills(args);
   },
 });

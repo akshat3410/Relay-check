@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, afterAll, beforeAll } from 'vitest';
-import { installSkillsCommand } from './install-skills.js';
+import { runInstallSkills } from './install-skills.js';
 
 describe('install-skills command', () => {
   const tempTestDir = join(__dirname, 'temp-install-test');
@@ -21,13 +21,11 @@ describe('install-skills command', () => {
 
   it('should install skills for all default providers', async () => {
     // Run the command
-    await installSkillsCommand.run({
-      args: {
-        cwd: tempTestDir,
-        providers: 'all',
-        global: false,
-      },
-    } as any);
+    await runInstallSkills({
+      cwd: tempTestDir,
+      providers: 'all',
+      global: false,
+    });
 
     // Verify Cursor rules
     const cursorRulePath = join(tempTestDir, '.cursor', 'rules', 'relay-qa.md');
@@ -58,13 +56,11 @@ describe('install-skills command', () => {
     mkdirSync(specificTempDir, { recursive: true });
 
     try {
-      await installSkillsCommand.run({
-        args: {
-          cwd: specificTempDir,
-          providers: 'cursor',
-          global: false,
-        },
-      } as any);
+      await runInstallSkills({
+        cwd: specificTempDir,
+        providers: 'cursor',
+        global: false,
+      });
 
       // Verify Cursor is installed
       expect(existsSync(join(specificTempDir, '.cursor', 'rules', 'relay-qa.md'))).toBe(true);
