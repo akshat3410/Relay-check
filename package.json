@@ -1,13 +1,16 @@
 {
   "name": "relay",
-  "private": true,
   "description": "Developer review platform — QA, security, release, architecture",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "bin": {
+    "relay": "./packages/cli/dist/cli.js"
+  },
   "dependencies": {
     "next": "^14.0.0"
   },
   "scripts": {
+    "prepare": "pnpm install && turbo run build",
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
