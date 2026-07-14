@@ -27,12 +27,24 @@ It is not a linter. It is not an AI wrapper. It is a set of structured **skills*
 ## Installation
 
 ```bash
-# Install globally
-npm install -g @relay/cli
+# Clone the repo
+git clone https://github.com/akshat3410/Relay-check.git
+cd Relay-check
 
-# Or per-project (recommended)
-pnpm add -D @relay/cli
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Link the CLI globally
+cd packages/cli
+npm link
 ```
+
+After linking, the `relay` command will be available globally.
+
+> **npm package coming soon.** Once published, installation will be `npm install -g @relay/cli`.
 
 Then scaffold a config and verify your environment:
 
