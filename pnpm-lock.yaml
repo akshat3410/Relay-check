@@ -42,15 +42,54 @@ importers:
       '@relay/reporters':
         specifier: workspace:*
         version: link:../reporters
+      '@relay/rules-accessibility':
+        specifier: workspace:*
+        version: link:../rules/accessibility
+      '@relay/rules-architecture':
+        specifier: workspace:*
+        version: link:../rules/architecture
+      '@relay/rules-deployment':
+        specifier: workspace:*
+        version: link:../rules/deployment
+      '@relay/rules-documentation':
+        specifier: workspace:*
+        version: link:../rules/documentation
+      '@relay/rules-performance':
+        specifier: workspace:*
+        version: link:../rules/performance
+      '@relay/rules-security':
+        specifier: workspace:*
+        version: link:../rules/security
+      '@relay/rules-testing':
+        specifier: workspace:*
+        version: link:../rules/testing
       '@relay/shared':
         specifier: workspace:*
         version: link:../shared
+      c12:
+        specifier: ^2.0.1
+        version: 2.0.4
       citty:
         specifier: ^0.1.6
         version: 0.1.6
       consola:
         specifier: ^3.2.3
         version: 3.4.2
+      fast-glob:
+        specifier: ^3.3.2
+        version: 3.3.3
+      jiti:
+        specifier: ^2.4.2
+        version: 2.7.0
+      mlly:
+        specifier: ^1.7.4
+        version: 1.8.2
+      simple-git:
+        specifier: ^3.27.0
+        version: 3.36.0
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
     devDependencies:
       rimraf:
         specifier: ^6.0.1
