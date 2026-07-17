@@ -7,37 +7,37 @@ async function renderResult(result, args) {
   let output;
   switch (format) {
     case "json": {
-      const { JsonReporter } = await import("@relay/reporters/json");
+      const { JsonReporter } = await import("./json-ZLIMSNI6.js");
       const reporter = new JsonReporter();
       output = await reporter.render(result, { ci: args.ci });
       break;
     }
     case "markdown": {
-      const { MarkdownReporter } = await import("@relay/reporters/markdown");
+      const { MarkdownReporter } = await import("./markdown-Y5KWHADD.js");
       const reporter = new MarkdownReporter();
       output = await reporter.render(result);
       break;
     }
     case "sarif": {
-      const { SarifReporter } = await import("@relay/reporters/sarif");
+      const { SarifReporter } = await import("./sarif-3FRR7Y6Z.js");
       const reporter = new SarifReporter();
       output = await reporter.render(result);
       break;
     }
     case "html": {
-      const { HtmlReporter } = await import("@relay/reporters/html");
+      const { HtmlReporter } = await import("./html-J3ENDDM2.js");
       const reporter = new HtmlReporter();
       output = await reporter.render(result);
       break;
     }
     case "github": {
-      const { GithubReporter } = await import("@relay/reporters/github");
+      const { GithubReporter } = await import("./github-XEYKPAOX.js");
       const reporter = new GithubReporter();
       output = await reporter.render(result);
       break;
     }
     default: {
-      const { TerminalReporter } = await import("@relay/reporters/terminal");
+      const { TerminalReporter } = await import("./terminal-6P7DSEK5.js");
       const reporter = new TerminalReporter();
       output = await reporter.render(result, { color: !args.ci, ci: args.ci });
       break;
@@ -54,4 +54,4 @@ async function renderResult(result, args) {
 export {
   renderResult
 };
-//# sourceMappingURL=chunk-3CEFTVNR.js.map
+//# sourceMappingURL=chunk-FEMG3LOV.js.map

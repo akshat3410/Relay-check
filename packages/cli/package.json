@@ -24,8 +24,21 @@
     "@relay/core": "workspace:*",
     "@relay/reporters": "workspace:*",
     "@relay/shared": "workspace:*",
+    "@relay/rules-security": "workspace:*",
+    "@relay/rules-accessibility": "workspace:*",
+    "@relay/rules-performance": "workspace:*",
+    "@relay/rules-testing": "workspace:*",
+    "@relay/rules-architecture": "workspace:*",
+    "@relay/rules-deployment": "workspace:*",
+    "@relay/rules-documentation": "workspace:*",
+    "c12": "^2.0.1",
     "citty": "^0.1.6",
-    "consola": "^3.2.3"
+    "consola": "^3.2.3",
+    "fast-glob": "^3.3.2",
+    "jiti": "^2.4.2",
+    "mlly": "^1.7.4",
+    "simple-git": "^3.27.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "rimraf": "^6.0.1",
