@@ -1064,30 +1064,74 @@ async function runInstallSkills(args) {
     }
   }
   if (isAll || providerList.includes("claude")) {
-    if (args.global) {
-      const globalClaudeDir = join4(homedir(), ".claude", "skills");
-      logger6.info("Installing Claude Code skills globally...");
-      for (const skill of skillsList) {
-        safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content);
-      }
-    } else {
-      const localClaudeDir = join4(cwd, ".claude", "skills");
-      logger6.info("Installing Claude Code skills locally...");
-      for (const skill of skillsList) {
-        safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content);
-      }
-      const claudeCommandsDir = join4(cwd, ".claude", "commands");
-      logger6.info("Installing Claude Code slash commands...");
-      for (const skill of skillsList) {
-        let cleanContent = skill.content;
-        if (cleanContent.startsWith("---")) {
-          const parts = cleanContent.split("---");
-          if (parts.length >= 3) {
-            cleanContent = parts.slice(2).join("---").trim();
-          }
+    const globalClaudeDir = join4(homedir(), ".claude", "skills");
+    const globalClaudeCommandsDir = join4(homedir(), ".claude", "commands");
+    logger6.info("Installing Claude Code skills globally...");
+    for (const skill of skillsList) {
+      safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content);
+    }
+    logger6.info("Installing Claude Code global slash commands...");
+    for (const skill of skillsList) {
+      let cleanContent = skill.content;
+      if (cleanContent.startsWith("---")) {
+        const parts = cleanContent.split("---");
+        if (parts.length >= 3) {
+          cleanContent = parts.slice(2).join("---").trim();
         }
-        safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
       }
+      safeWriteFile(globalClaudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
+    }
+    const localClaudeDir = join4(cwd, ".claude", "skills");
+    logger6.info("Installing Claude Code skills locally...");
+    for (const skill of skillsList) {
+      safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content);
+    }
+    const claudeCommandsDir = join4(cwd, ".claude", "commands");
+    logger6.info("Installing Claude Code slash commands...");
+    for (const skill of skillsList) {
+      let cleanContent = skill.content;
+      if (cleanContent.startsWith("---")) {
+        const parts = cleanContent.split("---");
+        if (parts.length >= 3) {
+          cleanContent = parts.slice(2).join("---").trim();
+        }
+      }
+      safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
+    }
+  }
+  if (isAll || providerList.includes("antigravity") || providerList.includes("gemini")) {
+    logger6.info("Installing Google Antigravity skills and workflows...");
+    const globalAgySkillsDir1 = join4(homedir(), ".gemini", "config", "skills");
+    const globalAgySkillsDir2 = join4(homedir(), ".gemini", "antigravity", "skills");
+    const globalAgyWorkflowsDir = join4(homedir(), ".gemini", "config", "global_workflows");
+    logger6.info("Installing Antigravity global skills and workflows...");
+    for (const skill of skillsList) {
+      safeWriteFile(join4(globalAgySkillsDir1, `relay-${skill.name}`), "SKILL.md", skill.content);
+      safeWriteFile(join4(globalAgySkillsDir2, `relay-${skill.name}`), "SKILL.md", skill.content);
+      let cleanContent = skill.content;
+      if (cleanContent.startsWith("---")) {
+        const parts = cleanContent.split("---");
+        if (parts.length >= 3) {
+          cleanContent = parts.slice(2).join("---").trim();
+        }
+      }
+      safeWriteFile(globalAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent);
+    }
+    const localAgySkillsDir1 = join4(cwd, ".agents", "skills");
+    const localAgySkillsDir2 = join4(cwd, ".agent", "skills");
+    const localAgyWorkflowsDir = join4(cwd, ".agents", "workflows");
+    logger6.info("Installing Antigravity local workspace skills and workflows...");
+    for (const skill of skillsList) {
+      safeWriteFile(join4(localAgySkillsDir1, `relay-${skill.name}`), "SKILL.md", skill.content);
+      safeWriteFile(join4(localAgySkillsDir2, `relay-${skill.name}`), "SKILL.md", skill.content);
+      let cleanContent = skill.content;
+      if (cleanContent.startsWith("---")) {
+        const parts = cleanContent.split("---");
+        if (parts.length >= 3) {
+          cleanContent = parts.slice(2).join("---").trim();
+        }
+      }
+      safeWriteFile(localAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent);
     }
   }
   if (isAll || providerList.includes("agents")) {
@@ -1161,13 +1205,13 @@ var installSkillsCommand = defineCommand3({
     },
     providers: {
       type: "string",
-      description: "Comma-separated assistant providers to install for (cursor, claude, copilot, agents, all)",
+      description: "Comma-separated assistant providers to install for (cursor, claude, copilot, agents, antigravity, all)",
       default: "all"
     },
     global: {
       type: "boolean",
       description: "Install Claude skills globally (~/.claude/skills)",
-      default: false
+      default: true
     }
   },
   async run({ args }) {

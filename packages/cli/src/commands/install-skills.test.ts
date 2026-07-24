@@ -30,7 +30,7 @@ describe('install-skills command', () => {
     // Verify Cursor rules
     const cursorRulePath = join(tempTestDir, '.cursor', 'rules', 'relay-qa.md');
     expect(existsSync(cursorRulePath)).toBe(true);
-    expect(readFileSync(cursorRulePath, 'utf8')).toContain('QA Review Skill');
+    expect(readFileSync(cursorRulePath, 'utf8')).toContain('Relay QA Review Skill');
 
     // Verify Claude skills
     const claudeSkillPath = join(tempTestDir, '.claude', 'skills', 'relay-qa.md');
@@ -39,6 +39,14 @@ describe('install-skills command', () => {
     // Verify general agents
     const agentsSkillPath = join(tempTestDir, '.agents', 'skills', 'relay-qa.md');
     expect(existsSync(agentsSkillPath)).toBe(true);
+
+    // Verify Antigravity skills and workflows
+    const agySkillPath1 = join(tempTestDir, '.agents', 'skills', 'relay-qa', 'SKILL.md');
+    const agySkillPath2 = join(tempTestDir, '.agent', 'skills', 'relay-qa', 'SKILL.md');
+    const agyWorkflowPath = join(tempTestDir, '.agents', 'workflows', 'relay-qa.md');
+    expect(existsSync(agySkillPath1)).toBe(true);
+    expect(existsSync(agySkillPath2)).toBe(true);
+    expect(existsSync(agyWorkflowPath)).toBe(true);
 
     // Verify Copilot instructions
     const copilotPath = join(tempTestDir, '.github', 'copilot-instructions.md');
@@ -65,8 +73,9 @@ describe('install-skills command', () => {
       // Verify Cursor is installed
       expect(existsSync(join(specificTempDir, '.cursor', 'rules', 'relay-qa.md'))).toBe(true);
 
-      // Verify Claude and Copilot are NOT installed
+      // Verify Claude, Antigravity, and Copilot are NOT installed
       expect(existsSync(join(specificTempDir, '.claude', 'skills', 'relay-qa.md'))).toBe(false);
+      expect(existsSync(join(specificTempDir, '.agents', 'workflows', 'relay-qa.md'))).toBe(false);
       expect(existsSync(join(specificTempDir, '.github', 'copilot-instructions.md'))).toBe(false);
     } finally {
       if (existsSync(specificTempDir)) {

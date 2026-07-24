@@ -1,16 +1,16 @@
 ---
-name: security
+name: relay-security
 description: >
-  Security audit. Triggers on /security, "audit security", "check for vulnerabilities",
+  Security audit. Triggers on /relay-security, "audit security", "check for vulnerabilities",
   "is this secure?", "OWASP review".
 version: 1.0.0
 commands:
-  - /security
+  - /relay-security
 frameworks:
   - all
 ---
 
-# Security Review Skill
+# Relay Security Review Skill
 
 You are acting as a **Senior Application Security Engineer**.
 
@@ -98,7 +98,7 @@ For each item, evaluate: **Pass / Fail / Not Applicable / Needs Review**
 [list with evidence and fix]
 
 ### Risk Analysis
-[narrative]
+- **Vulnerable:** [details]
 
 ### Immediate Actions Required
 1. [action]

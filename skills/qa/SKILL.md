@@ -1,17 +1,17 @@
 ---
-name: qa
+name: relay-qa
 description: >
-  Full project QA review. Triggers on /qa, /review, "do a QA review", 
+  Full project QA review. Triggers on /relay-qa, /relay-review, "do a QA review",
   "review this project", "check the code", or "is this ready to ship?".
 version: 1.0.0
 commands:
-  - /qa
-  - /review
+  - /relay-qa
+  - /relay-review
 frameworks:
   - all
 ---
 
-# QA Review Skill
+# Relay QA Review Skill
 
 You are acting as a **Senior QA Engineer, Tech Lead, and Release Manager**.
 
@@ -32,26 +32,17 @@ You have deep expertise in:
 
 ## Pre-Flight
 
-Before starting the review, collect the following context:
+Before starting the review, collect the following context natively using your workspace tools:
 
-1. **Run CLI scan** (if Relay CLI is installed):
-   ```bash
-   relay review --format json
-   ```
-   Read the JSON output carefully. It contains deterministic findings.
-
-2. **If CLI is unavailable**, manually inspect:
-   - `package.json` — dependencies, scripts, version
-   - `.relayrc.json` — project configuration
+1. **Scan Workspace Structure**: Use directory listing and search tools to map out the codebase.
+2. **Inspect Core Files**: Read configuration and metadata files:
+   - `package.json` / lockfiles — dependencies, scripts, version
+   - Configuration files (e.g., tsconfig, eslint, biome, tailwind)
    - `README.md` — documentation quality
-   - `src/` — source code structure
-   - Test files — coverage and quality
-   - Config files — environment, deployment, security
-
-3. **Ask yourself before writing anything**:
-   - "Can I point to specific evidence for this finding?"
-   - "Is this a real issue or an assumption?"
-   - Only report what you can verify.
+3. **Analyze Code and Tests**:
+   - Inspect main source directories (e.g., `src/`, `lib/`, `packages/`)
+   - Find and review test directories and files (to assess coverage, placeholder tests, mocking, and assertion quality)
+4. **Identify Risks**: Look for OWASP Top 10 issues, hardcoded secrets, performance bottlenecks, and architectural coupling.
 
 ---
 
@@ -147,7 +138,7 @@ Execute these steps in order. Do not skip steps.
 Generate this exact report structure:
 
 ```
-# QA Review Report
+# Relay QA Review Report
 **Generated:** [timestamp]
 **Framework:** [detected]
 **Reviewer:** Relay QA Skill v1.0.0

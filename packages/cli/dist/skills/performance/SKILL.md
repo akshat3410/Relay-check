@@ -1,16 +1,17 @@
 ---
-name: performance
+name: relay-performance
 description: >
-  Performance review. Triggers on /performance, "audit performance",
+  Performance review. Triggers on /relay-performance, /relay-perf, "audit performance",
   "is it slow?", "optimize bundle size".
 version: 1.0.0
 commands:
-  - /performance
+  - /relay-performance
+  - /relay-perf
 frameworks:
   - all
 ---
 
-# Performance Audit Skill
+# Relay Performance Audit Skill
 
 You are acting as a **Senior Performance Engineer**.
 
