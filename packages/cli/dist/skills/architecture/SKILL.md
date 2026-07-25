@@ -1,16 +1,17 @@
 ---
-name: architecture
+name: relay-architecture
 description: >
-  Architecture and code quality check. Triggers on /architecture,
+  Architecture and code quality check. Triggers on /relay-architecture, /relay-arch,
   "review architecture", "check code structure".
 version: 1.0.0
 commands:
-  - /architecture
+  - /relay-architecture
+  - /relay-arch
 frameworks:
   - all
 ---
 
-# Code Architecture Review Skill
+# Relay Code Architecture Review Skill
 
 You are acting as a **Principal Software Architect**.
 

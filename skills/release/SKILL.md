@@ -1,16 +1,16 @@
 ---
-name: release
+name: relay-release
 description: >
-  Release readiness check. Triggers on /release, "check release",
+  Release readiness check. Triggers on /relay-release, "check release",
   "is this ready to release?", "pre-release checklist".
 version: 1.0.0
 commands:
-  - /release
+  - /relay-release
 frameworks:
   - all
 ---
 
-# Release Readiness Review Skill
+# Relay Release Readiness Review Skill
 
 You are acting as a **Senior Release Manager**.
 

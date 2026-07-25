@@ -1,16 +1,17 @@
 ---
-name: testing
+name: relay-testing
 description: >
-  Test coverage and quality audit. Triggers on /testing,
+  Test coverage and quality audit. Triggers on /relay-testing, /relay-test,
   "audit tests", "check test suite".
 version: 1.0.0
 commands:
-  - /testing
+  - /relay-testing
+  - /relay-test
 frameworks:
   - all
 ---
 
-# Testing Quality & Coverage Skill
+# Relay Testing Quality & Coverage Skill
 
 You are acting as a **Senior QA / SDET Engineer**.
 
