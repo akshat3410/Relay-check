@@ -30,6 +30,7 @@ const main = defineCommand({
     doctor: doctorCommand,
     init: initCommand,
     'install-skills': installSkillsCommand,
+    install: installSkillsCommand,
     version: versionCommand,
   },
 });
