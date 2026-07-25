@@ -1437,6 +1437,7 @@ var main = defineCommand8({
     doctor: doctorCommand,
     init: initCommand,
     "install-skills": installSkillsCommand,
+    install: installSkillsCommand,
     version: versionCommand
   }
 });
