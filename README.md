@@ -21,7 +21,7 @@ No complex local AST binaries, no heavy dependency footprint. Your assistant exe
 
 1. **Install Skills** — Run the automated installer inside any project directory:
    ```bash
-   npx relay install-skills
+   npx @akshat3410/relay install-skills
    ```
 2. **Trigger Commands** — Use native slash commands or custom workflows directly inside your AI assistant's chat (e.g., `/relay-qa`, `/relay-security`).
 3. **Get Results** — The assistant applies Relay's precise checklist methodology and outputs a structured Markdown report with a clear decision.
@@ -33,7 +33,7 @@ No complex local AST binaries, no heavy dependency footprint. Your assistant exe
 Run the following command inside your project directory to install Relay skills:
 
 ```bash
-npx relay install-skills
+npx @akshat3410/relay install-skills
 ```
 
 By default, Relay automatically installs all skills **locally** (for the current workspace) and **globally** (across your entire machine) for all detected assistant providers.
