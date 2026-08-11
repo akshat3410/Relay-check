@@ -699,6 +699,21 @@ Use this structure:
 
 ---
 
+## STAGE 23 — HIGH-AESTHETIC CODE EXECUTION MANDATE
+
+Whenever generating actual code, HTML/CSS/JS, React components, or visual prototypes for the website, strictly enforce these 8 visual craftsmanship rules to guarantee an Awwwards / Apple / Vercel grade finish:
+
+1. **NO RAW DEFAULT COLORS**: Never use basic `#ffffff`, `#000000`, `blue`, `red`, `purple`. Always define and use custom HSL CSS tokens (`--bg: hsl(240, 15%, 4%)`, `--surface: hsl(240, 12%, 8%)`, `--accent: hsl(217, 91%, 60%)`, `--border: rgba(255, 255, 255, 0.08)`).
+2. **MODERN TYPOGRAPHY SYSTEM**: Always import Google Fonts (`Outfit`, `Syne`, `Cabinet Grotesk`, `Plus Jakarta Sans`, `Inter`, `Space Grotesk`, `Cormorant Garamond`). Enforce negative tracking on display headings (`letter-spacing: -0.03em`), proportional line heights (`1.1` to `1.25` for display, `1.6` for body text), and uppercase monospaced micro-labels (`11px font-mono tracking-widest text-muted`).
+3. **GLASSMORPHISM & SPECULAR LIGHTING**: Combine `backdrop-filter: blur(20px)`, low-opacity background gradients (`linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)`), and 1px specular top/side borders (`border-top: 1px solid rgba(255, 255, 255, 0.15)`).
+4. **AMBIENT ATMOSPHERICS & RADIAL GLOWS**: Use background radial ambient glows (`background: radial-gradient(circle at 50% 0%, rgba(0, 114, 245, 0.15), transparent 70%)`) and multi-layered soft shadows (`box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5)`).
+5. **BENTO GRID ARCHITECTURE**: Structure features using asymmetrical modular grid layouts (`display: grid; grid-template-columns: repeat(12, 1fr)`), high visual loudness contrast (scale hierarchy), and 24px container border radius.
+6. **LUXURY SPACING**: Maintain generous vertical whitespace (`padding: 120px 24px` for hero and major sections, `gap: 24px` for grid items). Never crowd content against container borders.
+7. **MICRO-INTERACTION PHYSICS**: Apply spring/cubic-bezier motion (`transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1)`), hover transforms (`transform: translateY(-4px)`), active button state feedback, and subtle hover glow highlights.
+8. **ZERO BROWSER DEFAULTS**: Fully style custom scrollbars (`::-webkit-scrollbar`), zero out default button/input borders, add custom badge styling, hover reveals, and zero unstyled text links.
+
+---
+
 ## CRITICAL RULES
 
 ### RULE 1: DO NOT OVER-DESIGN
