@@ -1,7 +1,7 @@
 {
   "name": "@akshatdev/relay",
   "description": "Developer review platform — QA, security, release, architecture",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "bin": {
     "relay": "./packages/cli/dist/cli.js"
@@ -10,7 +10,16 @@
     "packages/cli/dist",
     "README.md"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "c12": "^2.0.1",
+    "citty": "^0.1.6",
+    "consola": "^3.2.3",
+    "fast-glob": "^3.3.2",
+    "jiti": "^2.4.2",
+    "mlly": "^1.7.4",
+    "simple-git": "^3.27.0",
+    "zod": "^3.24.1"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",

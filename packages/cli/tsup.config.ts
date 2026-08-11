@@ -9,10 +9,7 @@ export default defineConfig({
   clean: true,
   target: 'node18',
   outDir: 'dist',
-  // Bundle only @relay/* workspace packages inline — they're not published to npm
-  // so they won't be in node_modules when installed via npx github:.
-  // All other deps (fast-glob, c12, simple-git, zod, consola, citty) stay external —
-  // they're in package.json dependencies and install normally via npm/npx.
+  // Bundle only @relay/* workspace packages inline
   noExternal: [/@relay\/.*/],
   banner: {
     js: '#!/usr/bin/env node',
