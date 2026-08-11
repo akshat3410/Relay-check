@@ -48,3 +48,10 @@ temp_config.json
 test_resolve.js
 cloned_repos/
 
+# Local-only agent state, research, and skills
+.agents/
+.pes/
+scripts/
+skills/
+*.md
+!README.md
