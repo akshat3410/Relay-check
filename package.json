@@ -1,7 +1,7 @@
 {
   "name": "@akshatdev/relay",
   "description": "Developer review platform — QA, security, release, architecture",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "bin": {
     "relay": "./packages/cli/dist/cli.js"

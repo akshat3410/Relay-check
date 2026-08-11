@@ -10,11 +10,11 @@
 
 ---
 
-**Relay** equips your AI coding assistant with a structured software engineering review methodology — turning it into a Senior QA Engineer, Security Auditor, Tech Lead, or Release Manager on demand.
+**Relay** equips your AI coding assistant with a multidisciplinary software & brand engineering system — turning it into a Senior QA Engineer, Security Auditor, Brand Strategist, Tech Lead, or Release Manager on demand.
 
 Relay provides a suite of highly optimized **Agent-Native Skills & Workflows** that install directly into your AI developer assistant (Claude Code, Google Antigravity, Cursor, or GitHub Copilot) as native slash commands.
 
-No complex local AST binaries or heavy dependency footprints required. Your assistant executes reviews natively using workspace inspection tools to make highly accurate, context-aware decisions.
+From **scientific brand strategy & advertising psychology** to **OWASP security audits & release gating**, Relay provides structured decision frameworks for the entire software creation lifecycle.
 
 ---
 
@@ -41,7 +41,25 @@ By default, Relay automatically installs all skills **locally** (for the current
 
 ---
 
-## 🛠️ Core Skills & Slash Commands
+## 🎨 Brand & Product Experience System
+
+### 💎 `/relay-brand` (`/relay-brand-experience`, `/relay-ibe`) — Integrated Brand Experience
+A 22-stage design operating system that transforms a business idea or product into a cohesive digital experience by fusing **Marketing Strategy**, **Human Psychology**, **Visual/Brand Identity**, and **Web/Interaction Design**.
+
+Grounded in peer-reviewed cognitive neuroscience, advertising psychology, and visual storytelling research:
+- **Norman’s Tri-Level Emotional Processing** (Visceral, Behavioral, Reflective)
+- **Ramachandran’s Peak Shift Principle** & Neuroaesthetics
+- **Fauconnier & Turner’s Conceptual Blending** for Dual-Storytelling Logos
+- **Jonah Berger’s STEPPS & Arousal Theory** for Virality
+- **Mandler’s Schema Incongruity** & Processing Fluency
+
+```
+BRAND → HUMAN INSIGHT → MARKETING STRATEGY → PSYCHOLOGY → CREATIVE CONCEPT → VISUAL IDENTITY → LOGO / SYMBOL → WEB EXPERIENCE → INTERACTION → EMOTION → MEMORY → BEHAVIOR → CONVERSION → BUSINESS OUTCOME
+```
+
+---
+
+## 🛠️ Code Audit & Quality Skills
 
 Every skill is structured as an agent-native instruction set and can be invoked natively using slash commands in your AI assistant's chat interface.
 
