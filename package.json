@@ -6,9 +6,7 @@
   "bin": {
     "relay": "./packages/cli/dist/cli.js"
   },
-  "dependencies": {
-    "next": "^14.0.0"
-  },
+  "dependencies": {},
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
