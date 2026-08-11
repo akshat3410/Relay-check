@@ -6,6 +6,10 @@
   "bin": {
     "relay": "./packages/cli/dist/cli.js"
   },
+  "files": [
+    "packages/cli/dist",
+    "README.md"
+  ],
   "dependencies": {},
   "scripts": {
     "build": "turbo run build",
