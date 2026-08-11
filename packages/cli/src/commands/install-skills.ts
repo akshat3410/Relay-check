@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync, promises as fsPromises } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -72,126 +72,104 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
     `Discovered ${skillsList.length} skills: ${skillsList.map((s) => s.name).join(', ')}`
   );
 
-  // 3. Helper to write/create
-  const safeWriteFile = (dir: string, filename: string, content: string) => {
+  // 3. Helper to write/create with caching
+  const createdDirs = new Set<string>();
+
+  const safeWriteFileAsync = async (dir: string, filename: string, content: string) => {
     try {
-      if (!existsSync(dir)) {
-        mkdirSync(dir, { recursive: true });
+      if (!createdDirs.has(dir)) {
+        if (!existsSync(dir)) {
+          await fsPromises.mkdir(dir, { recursive: true });
+        }
+        createdDirs.add(dir);
       }
       const filePath = join(dir, filename);
-      writeFileSync(filePath, content, 'utf8');
-      logger.success(`Installed: ${join(dir, filename)}`);
+      await fsPromises.writeFile(filePath, content, 'utf8');
+      logger.success(`Installed: ${filePath}`);
     } catch (err) {
       logger.error(`Failed to write file in ${dir}:`, err);
     }
   };
 
+  const safeWriteFile = safeWriteFileAsync;
+
   // 4. Install for Cursor
   if (isAll || providerList.includes('cursor')) {
     const cursorDir = join(cwd, '.cursor', 'rules');
     logger.info('Installing Cursor rules...');
-    for (const skill of skillsList) {
-      safeWriteFile(cursorDir, `relay-${skill.name}.md`, skill.content);
-    }
+    await Promise.all(
+      skillsList.map((skill) => safeWriteFile(cursorDir, `relay-${skill.name}.md`, skill.content))
+    );
   }
 
   // 5. Install for Claude Code
   if (isAll || providerList.includes('claude')) {
-    // A. Global Install
     const globalClaudeDir = join(homedir(), '.claude', 'skills');
     const globalClaudeCommandsDir = join(homedir(), '.claude', 'commands');
-    logger.info('Installing Claude Code skills globally...');
-    for (const skill of skillsList) {
-      safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content);
-    }
-    logger.info('Installing Claude Code global slash commands...');
-    for (const skill of skillsList) {
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith('---')) {
-        const parts = cleanContent.split('---');
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join('---').trim();
-        }
-      }
-      safeWriteFile(globalClaudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
-    }
-
-    // B. Local Install
     const localClaudeDir = join(cwd, '.claude', 'skills');
-    logger.info('Installing Claude Code skills locally...');
-    for (const skill of skillsList) {
-      safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content);
-    }
-
     const claudeCommandsDir = join(cwd, '.claude', 'commands');
-    logger.info('Installing Claude Code slash commands...');
-    for (const skill of skillsList) {
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith('---')) {
-        const parts = cleanContent.split('---');
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join('---').trim();
+
+    logger.info('Installing Claude Code skills...');
+    await Promise.all(
+      skillsList.flatMap((skill) => {
+        let cleanContent = skill.content;
+        if (cleanContent.startsWith('---')) {
+          const parts = cleanContent.split('---');
+          if (parts.length >= 3) {
+            cleanContent = parts.slice(2).join('---').trim();
+          }
         }
-      }
-      safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
-    }
+
+        return [
+          safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content),
+          safeWriteFile(globalClaudeCommandsDir, `relay-${skill.name}.md`, cleanContent),
+          safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content),
+          safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent),
+        ];
+      })
+    );
   }
 
   // 6. Install for Google Antigravity
   if (isAll || providerList.includes('antigravity') || providerList.includes('gemini')) {
-    logger.info('Installing Google Antigravity skills and workflows...');
-
-    // A. Global Paths
     const globalAgySkillsDir1 = join(homedir(), '.gemini', 'config', 'skills');
     const globalAgySkillsDir2 = join(homedir(), '.gemini', 'antigravity', 'skills');
     const globalAgyWorkflowsDir = join(homedir(), '.gemini', 'config', 'global_workflows');
 
-    logger.info('Installing Antigravity global skills and workflows...');
-    for (const skill of skillsList) {
-      // Skills folders need SKILL.md inside them
-      safeWriteFile(join(globalAgySkillsDir1, `relay-${skill.name}`), 'SKILL.md', skill.content);
-      safeWriteFile(join(globalAgySkillsDir2, `relay-${skill.name}`), 'SKILL.md', skill.content);
-
-      // Workflows (slash commands) - strip frontmatter
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith('---')) {
-        const parts = cleanContent.split('---');
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join('---').trim();
-        }
-      }
-      safeWriteFile(globalAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent);
-    }
-
-    // B. Local Workspace Paths
     const localAgySkillsDir1 = join(cwd, '.agents', 'skills');
     const localAgySkillsDir2 = join(cwd, '.agent', 'skills');
     const localAgyWorkflowsDir = join(cwd, '.agents', 'workflows');
 
-    logger.info('Installing Antigravity local workspace skills and workflows...');
-    for (const skill of skillsList) {
-      safeWriteFile(join(localAgySkillsDir1, `relay-${skill.name}`), 'SKILL.md', skill.content);
-      safeWriteFile(join(localAgySkillsDir2, `relay-${skill.name}`), 'SKILL.md', skill.content);
-
-      // Workflows (slash commands) - strip frontmatter
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith('---')) {
-        const parts = cleanContent.split('---');
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join('---').trim();
+    logger.info('Installing Google Antigravity skills and workflows...');
+    await Promise.all(
+      skillsList.flatMap((skill) => {
+        let cleanContent = skill.content;
+        if (cleanContent.startsWith('---')) {
+          const parts = cleanContent.split('---');
+          if (parts.length >= 3) {
+            cleanContent = parts.slice(2).join('---').trim();
+          }
         }
-      }
-      safeWriteFile(localAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent);
-    }
+
+        return [
+          safeWriteFile(join(globalAgySkillsDir1, `relay-${skill.name}`), 'SKILL.md', skill.content),
+          safeWriteFile(join(globalAgySkillsDir2, `relay-${skill.name}`), 'SKILL.md', skill.content),
+          safeWriteFile(globalAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent),
+          safeWriteFile(join(localAgySkillsDir1, `relay-${skill.name}`), 'SKILL.md', skill.content),
+          safeWriteFile(join(localAgySkillsDir2, `relay-${skill.name}`), 'SKILL.md', skill.content),
+          safeWriteFile(localAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent),
+        ];
+      })
+    );
   }
 
   // 7. Install for Generic/Agents
   if (isAll || providerList.includes('agents')) {
     const agentsDir = join(cwd, '.agents', 'skills');
     logger.info('Installing general agent skills...');
-    for (const skill of skillsList) {
-      safeWriteFile(agentsDir, `relay-${skill.name}.md`, skill.content);
-    }
+    await Promise.all(
+      skillsList.map((skill) => safeWriteFile(agentsDir, `relay-${skill.name}.md`, skill.content))
+    );
   }
 
   // 8. Install for Copilot (Combined instructions)
@@ -219,7 +197,7 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
 
     try {
       if (!existsSync(githubDir)) {
-        mkdirSync(githubDir, { recursive: true });
+        await fsPromises.mkdir(githubDir, { recursive: true });
       }
 
       let finalFileContent = combinedContent;
@@ -238,7 +216,7 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
         }
       }
 
-      writeFileSync(copilotFile, finalFileContent, 'utf8');
+      await fsPromises.writeFile(copilotFile, finalFileContent, 'utf8');
       logger.success(`Installed: ${copilotFile}`);
     } catch (err) {
       logger.error('Failed to write Copilot instructions:', err);

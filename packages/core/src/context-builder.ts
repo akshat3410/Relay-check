@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, promises as fsPromises } from 'node:fs';
 import { join, relative } from 'node:path';
 import type { DependencyInfo, Framework, GitInfo, ProjectContext, SourceFile } from '@relay/shared';
 import fg from 'fast-glob';
@@ -114,38 +114,45 @@ export class ContextBuilder {
       absolute: true,
     });
 
-    const files: SourceFile[] = [];
-
-    for (const absPath of paths) {
+    const filePromises = paths.map(async (absPath) => {
       const ext = absPath.split('.').pop() ?? '';
-      if (!SOURCE_EXTENSIONS.has(ext)) continue;
+      if (!SOURCE_EXTENSIONS.has(ext)) return null;
 
       try {
-        const stat = statSync(absPath);
-        if (stat.size > MAX_FILE_SIZE_BYTES) continue;
+        const stat = await fsPromises.stat(absPath);
+        if (stat.size > MAX_FILE_SIZE_BYTES) return null;
 
-        const content = readFileSync(absPath, 'utf8');
+        const content = await fsPromises.readFile(absPath, 'utf8');
         const lines = content.split('\n');
 
-        files.push({
+        return {
           path: absPath,
           relativePath: relative(this.opts.cwd, absPath),
           extension: ext,
           content,
           lines,
           sizeBytes: stat.size,
-        });
+        };
       } catch {
-        // Skip unreadable files silently
+        return null;
       }
-    }
+    });
 
-    return files;
+    const results = await Promise.all(filePromises);
+    return results.filter((f): f is SourceFile => f !== null);
   }
 
   private async collectGitInfo(): Promise<GitInfo | null> {
     if (!existsSync(join(this.opts.cwd, '.git'))) return null;
 
+    const timeoutPromise = new Promise<null>((resolve) =>
+      setTimeout(() => resolve(null), 300)
+    );
+
+    return Promise.race([this.fetchGitInfo(), timeoutPromise]);
+  }
+
+  private async fetchGitInfo(): Promise<GitInfo | null> {
     try {
       const git: SimpleGit = simpleGit(this.opts.cwd);
       const [log, status, remotes] = await Promise.all([

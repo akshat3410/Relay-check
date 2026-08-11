@@ -33,29 +33,31 @@ export class RuleRunner {
     const allFindings: Finding[] = [];
     let rulesTriggered = 0;
 
-    for (const rule of applicable) {
-      // Apply severity override from config
-      const effectiveSeverity = this.resolveOverride(rule.id, rule.severity);
-      if (effectiveSeverity === 'off') continue;
+    const ruleResults = await Promise.allSettled(
+      applicable.map(async (rule) => {
+        const effectiveSeverity = this.resolveOverride(rule.id, rule.severity);
+        if (effectiveSeverity === 'off') return [];
 
-      try {
-        const findings = await rule.execute(ctx);
+        try {
+          const findings = await rule.execute(ctx);
+          return findings.map((f) => ({
+            ...f,
+            severity:
+              effectiveSeverity !== rule.severity ? (effectiveSeverity as Severity) : f.severity,
+            ruleName: rule.name,
+            docs: f.docs ?? rule.docs,
+          }));
+        } catch (err) {
+          logger.warn(`Rule ${rule.id} threw an error:`, err);
+          return [this.makeErrorFinding(rule, err)];
+        }
+      })
+    );
 
-        // Re-stamp with effective severity if overridden
-        const stamped = findings.map((f) => ({
-          ...f,
-          severity:
-            effectiveSeverity !== rule.severity ? (effectiveSeverity as Severity) : f.severity,
-          ruleName: rule.name,
-          docs: f.docs ?? rule.docs,
-        }));
-
-        if (stamped.length > 0) rulesTriggered++;
-        allFindings.push(...stamped);
-      } catch (err) {
-        // Rule crash = internal error finding, never halts the scan
-        logger.warn(`Rule ${rule.id} threw an error:`, err);
-        allFindings.push(this.makeErrorFinding(rule, err));
+    for (const res of ruleResults) {
+      if (res.status === 'fulfilled') {
+        if (res.value.length > 0) rulesTriggered++;
+        allFindings.push(...res.value);
       }
     }
 

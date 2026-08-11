@@ -18,7 +18,7 @@ import { join as join2 } from "path";
 import { createConsola } from "consola";
 import { loadConfig } from "c12";
 import { z } from "zod";
-import { existsSync, readFileSync, statSync, readdirSync } from "fs";
+import { existsSync, readFileSync, promises, readdirSync } from "fs";
 import { join, relative } from "path";
 import fg from "fast-glob";
 import { simpleGit } from "simple-git";
@@ -172,30 +172,37 @@ var ContextBuilder = class {
       followSymbolicLinks: false,
       absolute: true
     });
-    const files = [];
-    for (const absPath of paths) {
+    const filePromises = paths.map(async (absPath) => {
       const ext = absPath.split(".").pop() ?? "";
-      if (!SOURCE_EXTENSIONS.has(ext)) continue;
+      if (!SOURCE_EXTENSIONS.has(ext)) return null;
       try {
-        const stat = statSync(absPath);
-        if (stat.size > MAX_FILE_SIZE_BYTES) continue;
-        const content = readFileSync(absPath, "utf8");
+        const stat = await promises.stat(absPath);
+        if (stat.size > MAX_FILE_SIZE_BYTES) return null;
+        const content = await promises.readFile(absPath, "utf8");
         const lines = content.split("\n");
-        files.push({
+        return {
           path: absPath,
           relativePath: relative(this.opts.cwd, absPath),
           extension: ext,
           content,
           lines,
           sizeBytes: stat.size
-        });
+        };
       } catch {
+        return null;
       }
-    }
-    return files;
+    });
+    const results = await Promise.all(filePromises);
+    return results.filter((f) => f !== null);
   }
   async collectGitInfo() {
     if (!existsSync(join(this.opts.cwd, ".git"))) return null;
+    const timeoutPromise = new Promise(
+      (resolve) => setTimeout(() => resolve(null), 300)
+    );
+    return Promise.race([this.fetchGitInfo(), timeoutPromise]);
+  }
+  async fetchGitInfo() {
     try {
       const git = simpleGit(this.opts.cwd);
       const [log, status, remotes] = await Promise.all([
@@ -632,22 +639,28 @@ var RuleRunner = class {
     const applicable = this.filterRules(rules, ctx);
     const allFindings = [];
     let rulesTriggered = 0;
-    for (const rule of applicable) {
-      const effectiveSeverity = this.resolveOverride(rule.id, rule.severity);
-      if (effectiveSeverity === "off") continue;
-      try {
-        const findings = await rule.execute(ctx);
-        const stamped = findings.map((f) => ({
-          ...f,
-          severity: effectiveSeverity !== rule.severity ? effectiveSeverity : f.severity,
-          ruleName: rule.name,
-          docs: f.docs ?? rule.docs
-        }));
-        if (stamped.length > 0) rulesTriggered++;
-        allFindings.push(...stamped);
-      } catch (err) {
-        logger2.warn(`Rule ${rule.id} threw an error:`, err);
-        allFindings.push(this.makeErrorFinding(rule, err));
+    const ruleResults = await Promise.allSettled(
+      applicable.map(async (rule) => {
+        const effectiveSeverity = this.resolveOverride(rule.id, rule.severity);
+        if (effectiveSeverity === "off") return [];
+        try {
+          const findings = await rule.execute(ctx);
+          return findings.map((f) => ({
+            ...f,
+            severity: effectiveSeverity !== rule.severity ? effectiveSeverity : f.severity,
+            ruleName: rule.name,
+            docs: f.docs ?? rule.docs
+          }));
+        } catch (err) {
+          logger2.warn(`Rule ${rule.id} threw an error:`, err);
+          return [this.makeErrorFinding(rule, err)];
+        }
+      })
+    );
+    for (const res of ruleResults) {
+      if (res.status === "fulfilled") {
+        if (res.value.length > 0) rulesTriggered++;
+        allFindings.push(...res.value);
       }
     }
     const filtered = this.filterBySeverity(allFindings);
@@ -984,7 +997,7 @@ var initCommand = defineCommand2({
 });
 
 // src/commands/install-skills.ts
-import { existsSync as existsSync4, mkdirSync, readFileSync as readFileSync2, readdirSync as readdirSync2, writeFileSync as writeFileSync2 } from "fs";
+import { existsSync as existsSync4, readFileSync as readFileSync2, readdirSync as readdirSync2, promises as fsPromises } from "fs";
 import { homedir } from "os";
 import { dirname, join as join4 } from "path";
 import { fileURLToPath } from "url";
@@ -1044,102 +1057,88 @@ async function runInstallSkills(args) {
   logger6.success(
     `Discovered ${skillsList.length} skills: ${skillsList.map((s) => s.name).join(", ")}`
   );
-  const safeWriteFile = (dir, filename, content) => {
+  const createdDirs = /* @__PURE__ */ new Set();
+  const safeWriteFileAsync = async (dir, filename, content) => {
     try {
-      if (!existsSync4(dir)) {
-        mkdirSync(dir, { recursive: true });
+      if (!createdDirs.has(dir)) {
+        if (!existsSync4(dir)) {
+          await fsPromises.mkdir(dir, { recursive: true });
+        }
+        createdDirs.add(dir);
       }
       const filePath = join4(dir, filename);
-      writeFileSync2(filePath, content, "utf8");
-      logger6.success(`Installed: ${join4(dir, filename)}`);
+      await fsPromises.writeFile(filePath, content, "utf8");
+      logger6.success(`Installed: ${filePath}`);
     } catch (err) {
       logger6.error(`Failed to write file in ${dir}:`, err);
     }
   };
+  const safeWriteFile = safeWriteFileAsync;
   if (isAll || providerList.includes("cursor")) {
     const cursorDir = join4(cwd, ".cursor", "rules");
     logger6.info("Installing Cursor rules...");
-    for (const skill of skillsList) {
-      safeWriteFile(cursorDir, `relay-${skill.name}.md`, skill.content);
-    }
+    await Promise.all(
+      skillsList.map((skill) => safeWriteFile(cursorDir, `relay-${skill.name}.md`, skill.content))
+    );
   }
   if (isAll || providerList.includes("claude")) {
     const globalClaudeDir = join4(homedir(), ".claude", "skills");
     const globalClaudeCommandsDir = join4(homedir(), ".claude", "commands");
-    logger6.info("Installing Claude Code skills globally...");
-    for (const skill of skillsList) {
-      safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content);
-    }
-    logger6.info("Installing Claude Code global slash commands...");
-    for (const skill of skillsList) {
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith("---")) {
-        const parts = cleanContent.split("---");
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join("---").trim();
-        }
-      }
-      safeWriteFile(globalClaudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
-    }
     const localClaudeDir = join4(cwd, ".claude", "skills");
-    logger6.info("Installing Claude Code skills locally...");
-    for (const skill of skillsList) {
-      safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content);
-    }
     const claudeCommandsDir = join4(cwd, ".claude", "commands");
-    logger6.info("Installing Claude Code slash commands...");
-    for (const skill of skillsList) {
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith("---")) {
-        const parts = cleanContent.split("---");
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join("---").trim();
+    logger6.info("Installing Claude Code skills...");
+    await Promise.all(
+      skillsList.flatMap((skill) => {
+        let cleanContent = skill.content;
+        if (cleanContent.startsWith("---")) {
+          const parts = cleanContent.split("---");
+          if (parts.length >= 3) {
+            cleanContent = parts.slice(2).join("---").trim();
+          }
         }
-      }
-      safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent);
-    }
+        return [
+          safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content),
+          safeWriteFile(globalClaudeCommandsDir, `relay-${skill.name}.md`, cleanContent),
+          safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content),
+          safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent)
+        ];
+      })
+    );
   }
   if (isAll || providerList.includes("antigravity") || providerList.includes("gemini")) {
-    logger6.info("Installing Google Antigravity skills and workflows...");
     const globalAgySkillsDir1 = join4(homedir(), ".gemini", "config", "skills");
     const globalAgySkillsDir2 = join4(homedir(), ".gemini", "antigravity", "skills");
     const globalAgyWorkflowsDir = join4(homedir(), ".gemini", "config", "global_workflows");
-    logger6.info("Installing Antigravity global skills and workflows...");
-    for (const skill of skillsList) {
-      safeWriteFile(join4(globalAgySkillsDir1, `relay-${skill.name}`), "SKILL.md", skill.content);
-      safeWriteFile(join4(globalAgySkillsDir2, `relay-${skill.name}`), "SKILL.md", skill.content);
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith("---")) {
-        const parts = cleanContent.split("---");
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join("---").trim();
-        }
-      }
-      safeWriteFile(globalAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent);
-    }
     const localAgySkillsDir1 = join4(cwd, ".agents", "skills");
     const localAgySkillsDir2 = join4(cwd, ".agent", "skills");
     const localAgyWorkflowsDir = join4(cwd, ".agents", "workflows");
-    logger6.info("Installing Antigravity local workspace skills and workflows...");
-    for (const skill of skillsList) {
-      safeWriteFile(join4(localAgySkillsDir1, `relay-${skill.name}`), "SKILL.md", skill.content);
-      safeWriteFile(join4(localAgySkillsDir2, `relay-${skill.name}`), "SKILL.md", skill.content);
-      let cleanContent = skill.content;
-      if (cleanContent.startsWith("---")) {
-        const parts = cleanContent.split("---");
-        if (parts.length >= 3) {
-          cleanContent = parts.slice(2).join("---").trim();
+    logger6.info("Installing Google Antigravity skills and workflows...");
+    await Promise.all(
+      skillsList.flatMap((skill) => {
+        let cleanContent = skill.content;
+        if (cleanContent.startsWith("---")) {
+          const parts = cleanContent.split("---");
+          if (parts.length >= 3) {
+            cleanContent = parts.slice(2).join("---").trim();
+          }
         }
-      }
-      safeWriteFile(localAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent);
-    }
+        return [
+          safeWriteFile(join4(globalAgySkillsDir1, `relay-${skill.name}`), "SKILL.md", skill.content),
+          safeWriteFile(join4(globalAgySkillsDir2, `relay-${skill.name}`), "SKILL.md", skill.content),
+          safeWriteFile(globalAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent),
+          safeWriteFile(join4(localAgySkillsDir1, `relay-${skill.name}`), "SKILL.md", skill.content),
+          safeWriteFile(join4(localAgySkillsDir2, `relay-${skill.name}`), "SKILL.md", skill.content),
+          safeWriteFile(localAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent)
+        ];
+      })
+    );
   }
   if (isAll || providerList.includes("agents")) {
     const agentsDir = join4(cwd, ".agents", "skills");
     logger6.info("Installing general agent skills...");
-    for (const skill of skillsList) {
-      safeWriteFile(agentsDir, `relay-${skill.name}.md`, skill.content);
-    }
+    await Promise.all(
+      skillsList.map((skill) => safeWriteFile(agentsDir, `relay-${skill.name}.md`, skill.content))
+    );
   }
   if (isAll || providerList.includes("copilot")) {
     const githubDir = join4(cwd, ".github");
@@ -1168,7 +1167,7 @@ ${cleanContent}
     combinedContent += `${separatorEnd}`;
     try {
       if (!existsSync4(githubDir)) {
-        mkdirSync(githubDir, { recursive: true });
+        await fsPromises.mkdir(githubDir, { recursive: true });
       }
       let finalFileContent = combinedContent;
       if (existsSync4(copilotFile)) {
@@ -1184,7 +1183,7 @@ ${combinedContent}
 `;
         }
       }
-      writeFileSync2(copilotFile, finalFileContent, "utf8");
+      await fsPromises.writeFile(copilotFile, finalFileContent, "utf8");
       logger6.success(`Installed: ${copilotFile}`);
     } catch (err) {
       logger6.error("Failed to write Copilot instructions:", err);
