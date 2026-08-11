@@ -33,7 +33,7 @@ No complex local AST binaries, no heavy dependency footprint. Your assistant exe
 Run the following command inside your project directory to install Relay skills:
 
 ```bash
-npx @akshat3410/relay install-skills
+npx @akshatsoni/relay install-skills
 ```
 
 By default, Relay automatically installs all skills **locally** (for the current workspace) and **globally** (across your entire machine) for all detected assistant providers.
