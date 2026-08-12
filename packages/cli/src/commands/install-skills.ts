@@ -102,6 +102,25 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
     );
   }
 
+  // Helper to extract command aliases from frontmatter
+  const getCommandAliases = (content: string, name: string): string[] => {
+    const aliases = new Set<string>([`relay-${name}`]);
+    if (content.startsWith('---')) {
+      const parts = content.split('---');
+      if (parts.length >= 3) {
+        const frontmatter = parts[1];
+        const match = frontmatter.match(/commands:\s*\n((?:\s*-\s*\/[^\n]+\n?)+)/);
+        if (match) {
+          for (const line of match[1].split('\n')) {
+            const cmd = line.replace(/^\s*-\s*\/?/, '').trim();
+            if (cmd) aliases.add(cmd);
+          }
+        }
+      }
+    }
+    return Array.from(aliases);
+  };
+
   // 5. Install for Claude Code
   if (isAll || providerList.includes('claude')) {
     const globalClaudeDir = join(homedir(), '.claude', 'skills');
@@ -120,12 +139,18 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
           }
         }
 
-        return [
+        const cmdAliases = getCommandAliases(skill.content, skill.name);
+        const writes = [
           safeWriteFile(globalClaudeDir, `relay-${skill.name}.md`, skill.content),
-          safeWriteFile(globalClaudeCommandsDir, `relay-${skill.name}.md`, cleanContent),
           safeWriteFile(localClaudeDir, `relay-${skill.name}.md`, skill.content),
-          safeWriteFile(claudeCommandsDir, `relay-${skill.name}.md`, cleanContent),
         ];
+
+        for (const alias of cmdAliases) {
+          writes.push(safeWriteFile(globalClaudeCommandsDir, `${alias}.md`, cleanContent));
+          writes.push(safeWriteFile(claudeCommandsDir, `${alias}.md`, cleanContent));
+        }
+
+        return writes;
       })
     );
   }
@@ -151,14 +176,20 @@ export async function runInstallSkills(args: InstallSkillsArgs): Promise<void> {
           }
         }
 
-        return [
+        const cmdAliases = getCommandAliases(skill.content, skill.name);
+        const writes = [
           safeWriteFile(join(globalAgySkillsDir1, `relay-${skill.name}`), 'SKILL.md', skill.content),
           safeWriteFile(join(globalAgySkillsDir2, `relay-${skill.name}`), 'SKILL.md', skill.content),
-          safeWriteFile(globalAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent),
           safeWriteFile(join(localAgySkillsDir1, `relay-${skill.name}`), 'SKILL.md', skill.content),
           safeWriteFile(join(localAgySkillsDir2, `relay-${skill.name}`), 'SKILL.md', skill.content),
-          safeWriteFile(localAgyWorkflowsDir, `relay-${skill.name}.md`, cleanContent),
         ];
+
+        for (const alias of cmdAliases) {
+          writes.push(safeWriteFile(globalAgyWorkflowsDir, `${alias}.md`, cleanContent));
+          writes.push(safeWriteFile(localAgyWorkflowsDir, `${alias}.md`, cleanContent));
+        }
+
+        return writes;
       })
     );
   }
